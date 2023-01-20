@@ -1,0 +1,14 @@
+{
+  "name": "fcengine",
+  "version": "0.0.1",
+  "description": "The freecade game engine",
+  "main": "index.js",
+  "repository": "https://github.com/ewsgit/fcengine",
+  "type": "module",
+  "author": "Ewsgit",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "typescript": "^4.9.4"
+  }
+}
