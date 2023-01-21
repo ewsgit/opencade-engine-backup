@@ -1,4 +1,6 @@
-export function setupCanvas() {
+import Game from "./game";
+
+export function setupCanvas(game: Game) {
   document.body.innerHTML = `
     <canvas id="fcengine-canvas"></canvas>
   `;
@@ -23,6 +25,8 @@ export function setupCanvas() {
 
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, screenWidth(), screenHeight());
+
+    game.__internal__render()
   });
 }
 
