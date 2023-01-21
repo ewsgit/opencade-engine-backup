@@ -1,4 +1,4 @@
-import getContext, { getCanvas, setupCanvas } from "./canvas";
+import { getCanvas, getContext, setupCanvas } from "./canvas";
 import Game from "./game";
 
 const text = `🕹️ FreeCade Engine`
@@ -13,7 +13,6 @@ export default function initializeEngine(callback: (game: Game) => void) {
     drawFrame();
     if (animationProgress >= 100) {
       clearInterval(interval);
-      callback(game);
       const ctx = getContext();
       const width = getCanvas().width;
       const height = getCanvas().height;
@@ -30,9 +29,20 @@ export default function initializeEngine(callback: (game: Game) => void) {
       ctx.font = "48px Segoe Ui"
 
       ctx.fillText(text, width / 2, height / 2)
-      return game.__internal__beginRenderCycle()
+
+      ctx.fillRect(
+          25,
+          height - 75,
+          width - 50,
+          50
+      );
+      setTimeout(() => {
+        callback(game);
+
+        return game.__internal__beginRenderCycle()
+      }, 1000)
     }
-  }, 10);
+  }, 25);
 }
 
 function drawFrame() {

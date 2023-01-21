@@ -1,16 +1,17 @@
-import getContext from "./canvas";
+import { getContext } from "./canvas";
 import { layer } from "./game";
 
 export class RenderableObject {
+  // @ts-ignore
+  parent: layer
   private posX: number;
   private posY: number;
   private width: number;
   private height: number;
   private context: CanvasRenderingContext2D;
   private onRenderListeners: ((object: this) => void)[]
-
-  // @ts-ignore
-  parent: layer
+  private state: { [key: string]: any } = {}
+  private stateListeners: { [key: string]: ((value: any) => void)[] } = {}
 
   constructor() {
     this.posX = 0;
@@ -57,7 +58,7 @@ export class RenderableObject {
     return this
   }
 
-  onRender(callback: (object: this) => void) {
+  onRender(callback: (object: this) => any) {
     this.onRenderListeners.push(callback)
     return this
   }

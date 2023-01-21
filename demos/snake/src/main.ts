@@ -6,17 +6,17 @@ initializeEngine((game) => {
 
   layer.addEntity(
       new RenderableObject()
-          .onRender(obj => {
-            obj.setPosX(obj.getPosX() + 1)
+          .callback((obj) => {
+            obj.velocity = 0
           })
-  )
+          .onRender((obj) => {
+            if (game.screen().height() <= obj.getHeight() + obj.getPosY())
+              obj.velocity = obj.velocity * -0.99
 
-  layer.addEntity(
-      new RenderableObject().setPosX(50)
-  )
-
-  layer.addEntity(
-      new RenderableObject().setPosX(50).setPosY(30)
+            obj.velocity += 0.01
+            obj.setPosY(obj.getPosY() + obj.velocity)
+            return
+          })
   )
 
 })

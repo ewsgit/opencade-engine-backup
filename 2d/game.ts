@@ -1,4 +1,5 @@
 import { RenderableObject } from "./rendererableObject";
+import { getContext, screenHeight, screenWidth } from "./canvas";
 
 export default class Game {
   private scenes: { [key: string]: layer[] };
@@ -7,6 +8,14 @@ export default class Game {
   constructor() {
     this.scenes = { default: [ new layer(this) ] };
     this.currentScene = "default"
+  }
+
+  screen() {
+    return {
+      context: () => getContext(),
+      width: () => screenWidth(),
+      height: () => screenHeight()
+    }
   }
 
   getLayers() {
@@ -28,6 +37,9 @@ export default class Game {
   }
 
   __internal__render() {
+    this.screen().context().fillStyle = "#222";
+    this.screen().context().fillRect(0, 0, this.screen().width(), this.screen().height());
+
     this.scenes[this.currentScene].forEach((layer) => {
       layer.getEntities().forEach((entity) => {
         entity.render()

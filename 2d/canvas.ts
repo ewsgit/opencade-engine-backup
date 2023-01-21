@@ -34,7 +34,7 @@ export function getCanvas(): HTMLCanvasElement {
   return document.getElementById(`fcengine-canvas`) as HTMLCanvasElement;
 }
 
-export default function getContext(): CanvasRenderingContext2D {
+export function getContext(): CanvasRenderingContext2D {
   return getCanvas().getContext("2d") as CanvasRenderingContext2D;
 }
 
