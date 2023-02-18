@@ -38,10 +38,7 @@ export default defineConfig(({ command }) => {
           loadViteEnv(),
         ],
       }),
-      // Use Node.js API in the Renderer-process
-      renderer({
-        nodeIntegration: true,
-      }),
+      renderer(),
     ],
     server: {
       port: 5002

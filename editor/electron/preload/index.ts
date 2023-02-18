@@ -1,4 +1,7 @@
-function domReady(condition: DocumentReadyState[] = ['complete', 'interactive']) {
+import { contextBridge, ipcRenderer } from "electron"
+import { IElectronApi } from "../../src/electronApi";
+
+function domReady(condition: DocumentReadyState[] = [ 'complete', 'interactive' ]) {
   return new Promise(resolve => {
     if (condition.includes(document.readyState)) {
       resolve(true)
@@ -25,27 +28,32 @@ const safeDOM = {
   },
 }
 
-/**
- * https://tobiasahlin.com/spinkit
- * https://connoratherton.com/loaders
- * https://projects.lukehaas.me/css-loaders
- * https://matejkustec.github.io/SpinThatShit
- */
-function useLoading() {
-  const className = `loaders-css__square-spin`
+function Loader() {
+  const className = `loader`
   const styleContent = `
 @keyframes square-spin {
-  25% { transform: perspective(100px) rotateX(180deg) rotateY(0); }
-  50% { transform: perspective(100px) rotateX(180deg) rotateY(180deg); }
-  75% { transform: perspective(100px) rotateX(0) rotateY(180deg); }
-  100% { transform: perspective(100px) rotateX(0) rotateY(0); }
+  0% {
+    transform: perspective(2.5rem) scale(0.9);
+  }
+  50% {
+    transform: perspective(2.5rem) scale(1.1);
+  }
+  100% {
+    transform: perspective(2.5rem) scale(0.9);
+  }
 }
+
 .${className} > div {
   animation-fill-mode: both;
-  width: 50px;
-  height: 50px;
-  background: #fff;
-  animation: square-spin 3s 0s cubic-bezier(0.09, 0.57, 0.49, 0.9) infinite;
+  width: 8rem;
+  height: 8rem;
+  font-size: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  animation: square-spin 2s 0s ease-in-out infinite;
+  border-radius: 0.25rem;
 }
 .app-loading-wrap {
   position: fixed;
@@ -56,7 +64,7 @@ function useLoading() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #282c34;
+  background: #131827;
   z-index: 9;
 }
     `
@@ -66,7 +74,7 @@ function useLoading() {
   oStyle.id = 'app-loading-style'
   oStyle.innerHTML = styleContent
   oDiv.className = 'app-loading-wrap'
-  oDiv.innerHTML = `<div class="${className}"><div></div></div>`
+  oDiv.innerHTML = `<div class="${className}"><div>🕹️</div></div>`
 
   return {
     appendLoading() {
@@ -80,13 +88,19 @@ function useLoading() {
   }
 }
 
-// ----------------------------------------------------------------------
-
-const { appendLoading, removeLoading } = useLoading()
+const { appendLoading, removeLoading } = Loader()
 domReady().then(appendLoading)
 
 window.onmessage = (ev) => {
   ev.data.payload === 'removeLoading' && removeLoading()
 }
 
-setTimeout(removeLoading, 4999)
+setTimeout(removeLoading, 2000)
+
+contextBridge.exposeInMainWorld('electron', <IElectronApi>{
+  setTitle: (title) => ipcRenderer.send('set-title', title),
+  setSize: (params) => ipcRenderer.send("set-size", params),
+  closeWindow: () => ipcRenderer.send("close-window"),
+  toggleMaximized: () => ipcRenderer.send("toggle-maximized"),
+  minimize: () => ipcRenderer.send("minimize")
+})

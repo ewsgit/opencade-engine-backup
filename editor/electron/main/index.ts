@@ -2,16 +2,6 @@ import { app, BrowserWindow, ipcMain, shell } from 'electron'
 import { release } from 'node:os'
 import { join } from 'node:path'
 
-// The built directory structure
-//
-// ├─┬ dist-electron
-// │ ├─┬ main
-// │ │ └── index.js    > Electron-Main
-// │ └─┬ preload
-// │   └── index.js    > Preload-Scripts
-// ├─┬ dist
-// │ └── index.html    > Electron-Renderer
-
 process.env.DIST_ELECTRON = join(__dirname, '../')
 process.env.DIST = join(process.env.DIST_ELECTRON, '../dist')
 process.env.PUBLIC = process.env.VITE_DEV_SERVER_URL
@@ -32,7 +22,6 @@ if (!app.requestSingleInstanceLock()) {
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
 
 let win: BrowserWindow | null = null
-// Here, you can also use other preload
 const preload = join(__dirname, '../preload/index.js')
 const url = process.env.VITE_DEV_SERVER_URL
 const indexHtml = join(process.env.DIST, 'index.html')
@@ -43,10 +32,15 @@ async function createWindow() {
     icon: join(process.env.PUBLIC, 'favicon.ico'),
     webPreferences: {
       preload,
-      nodeIntegration: true,
-      contextIsolation: false,
+      plugins: true,
+      contextIsolation: true,
     },
     center: true,
+    frame: false,
+    roundedCorners: false,
+    transparent: true,
+    width: 386,
+    height: 466,
   })
 
   if (process.env.VITE_DEV_SERVER_URL) { // electron-vite-vue#298
@@ -101,9 +95,7 @@ app.on('activate', () => {
 ipcMain.handle('open-win', (_, arg) => {
   const childWindow = new BrowserWindow({
     webPreferences: {
-      preload,
-      nodeIntegration: true,
-      contextIsolation: false,
+      preload
     },
   })
 
@@ -112,4 +104,42 @@ ipcMain.handle('open-win', (_, arg) => {
   } else {
     childWindow.loadFile(indexHtml, { hash: arg })
   }
+})
+
+ipcMain.on("set-title", (event, title) => {
+  const webContents = event.sender
+  const win = BrowserWindow.fromWebContents(webContents)
+
+  win?.setTitle(title)
+})
+
+ipcMain.on("set-size", (event, params) => {
+  const webContents = event.sender
+  const win = BrowserWindow.fromWebContents(webContents)
+
+  win?.setSize(params.width, params.height, params.animate)
+})
+
+ipcMain.on("close-window", (event, params) => {
+  const webContents = event.sender
+  const win = BrowserWindow.fromWebContents(webContents)
+
+  win?.close()
+})
+
+ipcMain.on("toggle-maximized", (event, params) => {
+  const webContents = event.sender
+  const win = BrowserWindow.fromWebContents(webContents)
+
+  if (!win?.isMaximized())
+    return win?.maximize()
+
+  win?.unmaximize()
+})
+
+ipcMain.on("minimize", (event, params) => {
+  const webContents = event.sender
+  const win = BrowserWindow.fromWebContents(webContents)
+
+  win?.minimize()
 })
