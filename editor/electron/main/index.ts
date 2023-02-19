@@ -36,26 +36,19 @@ async function createWindow() {
       contextIsolation: true,
     },
     center: true,
-    frame: false,
-    roundedCorners: false,
-    transparent: true,
     width: 386,
     height: 466,
+    titleBarStyle: "hidden",
+    titleBarOverlay: true
   })
 
-  if (process.env.VITE_DEV_SERVER_URL) { // electron-vite-vue#298
+  win.removeMenu()
+  if (process.env.VITE_DEV_SERVER_URL) {
     win.loadURL(url)
-
-    win.removeMenu()
-
-    win.webContents.openDevTools({ mode: "detach", activate: false })
-
-    // win.webContents.openDevTools()
   } else {
     win.loadFile(indexHtml)
   }
 
-  // Test actively push message to the Electron-Renderer
   win.webContents.on('did-finish-load', () => {
     win?.webContents.send('main-process-message', new Date().toLocaleString())
   })
@@ -120,6 +113,13 @@ ipcMain.on("set-size", (event, params) => {
   win?.setSize(params.width, params.height, params.animate)
 })
 
+ipcMain.on("set-window-controls", (event, params) => {
+  const webContents = event.sender
+  const win = BrowserWindow.fromWebContents(webContents)
+
+  win?.setTitleBarOverlay(params?.titleBarOverlay)
+})
+
 ipcMain.on("close-window", (event, params) => {
   const webContents = event.sender
   const win = BrowserWindow.fromWebContents(webContents)
@@ -127,7 +127,7 @@ ipcMain.on("close-window", (event, params) => {
   win?.close()
 })
 
-ipcMain.on("toggle-maximized", (event, params) => {
+ipcMain.on("toggle-maximized", (event) => {
   const webContents = event.sender
   const win = BrowserWindow.fromWebContents(webContents)
 
@@ -137,9 +137,29 @@ ipcMain.on("toggle-maximized", (event, params) => {
   win?.unmaximize()
 })
 
-ipcMain.on("minimize", (event, params) => {
+ipcMain.on("minimize", (event) => {
   const webContents = event.sender
   const win = BrowserWindow.fromWebContents(webContents)
 
   win?.minimize()
+})
+
+let devtoolsWindow = <null | Electron.BrowserWindow>null
+
+ipcMain.on("open-devtools", (event) => {
+  const webContents = event.sender
+  const win = BrowserWindow.fromWebContents(webContents)
+
+  if (devtoolsWindow) return devtoolsWindow.focus()
+
+  devtoolsWindow = new BrowserWindow()
+
+  win?.webContents.setDevToolsWebContents(devtoolsWindow.webContents)
+  win?.webContents.openDevTools({ mode: "detach" })
+
+  devtoolsWindow.setPosition(0, 0);
+
+  devtoolsWindow.on("close", () => {
+    devtoolsWindow = null
+  })
 })

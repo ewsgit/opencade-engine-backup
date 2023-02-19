@@ -2,7 +2,7 @@
  * @see https://www.electron.build/configuration/configuration
  */
 {
-  "appId": "YourAppID",
+  "appId": "io.github.ewsgit.fcengine",
   "asar": true,
   "directories": {
     "output": "release/${version}"

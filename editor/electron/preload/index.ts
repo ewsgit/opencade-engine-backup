@@ -36,7 +36,7 @@ function Loader() {
     transform: perspective(2.5rem) scale(0.9);
   }
   50% {
-    transform: perspective(2.5rem) scale(1.1);
+    transform: perspective(2.5rem) scale(1.2);
   }
   100% {
     transform: perspective(2.5rem) scale(0.9);
@@ -47,12 +47,12 @@ function Loader() {
   animation-fill-mode: both;
   width: 8rem;
   height: 8rem;
-  font-size: 4rem;
+  font-size: 8rem;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  animation: square-spin 2s 0s ease-in-out infinite;
+  animation: square-spin 1.5s 0s ease-in-out infinite;
   border-radius: 0.25rem;
 }
 .app-loading-wrap {
@@ -95,12 +95,18 @@ window.onmessage = (ev) => {
   ev.data.payload === 'removeLoading' && removeLoading()
 }
 
-setTimeout(removeLoading, 2000)
+setTimeout(removeLoading, 1000)
 
 contextBridge.exposeInMainWorld('electron', <IElectronApi>{
   setTitle: (title) => ipcRenderer.send('set-title', title),
   setSize: (params) => ipcRenderer.send("set-size", params),
   closeWindow: () => ipcRenderer.send("close-window"),
   toggleMaximized: () => ipcRenderer.send("toggle-maximized"),
-  minimize: () => ipcRenderer.send("minimize")
+  minimize: () => ipcRenderer.send("minimize"),
+  setWindowControls: (params) => {
+    ipcRenderer.send("set-window-controls", params)
+  },
+  openDevTools: () => ipcRenderer.send("open-devtools"),
+  setBackgroundTransparent: () => ipcRenderer.send("set-background-transparent"),
+  setBackgroundSolid: () => ipcRenderer.send("set-background-solid"),
 })

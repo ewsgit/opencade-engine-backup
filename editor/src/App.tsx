@@ -1,27 +1,49 @@
 import { useEffect, useState } from 'react'
 import EditorLayout from './Main/Layout/Layout'
+import electronApi from "@/electronApi";
 
 function App() {
   const [ isLoading, setIsLoading ] = useState(true)
 
   useEffect(() => {
+    electronApi()
+        .setWindowControls({
+          titleBarOverlay: {
+            height: 0,
+            color: "#111827",
+            symbolColor: "#111827"
+          }
+        })
     setTimeout(() => {
       setIsLoading(false)
-    }, 5000)
+    }, 2000)
   }, [])
 
   useEffect(() => {
     if (!isLoading) {
-      window.electron.setSize({ width: 1000, height: 700, animate: true })
+      electronApi()
+          .setSize({
+            width: 1000,
+            height: 700,
+            animate: false
+          })
+      electronApi()
+          .setWindowControls({
+            titleBarOverlay: {
+              height: 29,
+              color: "#374151",
+              symbolColor: "#ffffff"
+            }
+          })
     }
   }, [ isLoading ])
 
   if (isLoading)
     return (
         <div
-            className={"bg-gray-900 w-full h-full flex items-center justify-center rounded-2xl overflow-hidden animate-fade-in"}>
+            className={"bg-gray-900 w-full h-full flex items-center justify-center overflow-hidden"}>
           <div
-              className="outline-gray-600 w-[380px] h-[460px] outline outline-4 rounded-xl transition-all select-none"
+              className="w-full h-full transition-all select-none animate-fade-in"
               onClick={() => {
                 setIsLoading(false)
               }}>
