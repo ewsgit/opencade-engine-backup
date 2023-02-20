@@ -28,19 +28,19 @@ const indexHtml = join(process.env.DIST, 'index.html')
 
 async function createWindow() {
   win = new BrowserWindow({
-    title: 'Main window',
-    icon: join(process.env.PUBLIC, 'favicon.ico'),
-    webPreferences: {
-      preload,
-      plugins: true,
-      contextIsolation: true,
-    },
-    center: true,
-    width: 386,
-    height: 466,
-    titleBarStyle: "hidden",
-    titleBarOverlay: true
-  })
+                            title: 'Main window',
+                            icon: join(process.env.PUBLIC, 'favicon.ico'),
+                            webPreferences: {
+                              preload,
+                              plugins: true,
+                              contextIsolation: true,
+                            },
+                            center: true,
+                            width: 386,
+                            height: 466,
+                            titleBarStyle: "hidden",
+                            titleBarOverlay: true
+                          })
 
   win.removeMenu()
   if (process.env.VITE_DEV_SERVER_URL) {
@@ -87,10 +87,10 @@ app.on('activate', () => {
 // New window example arg: new windows url
 ipcMain.handle('open-win', (_, arg) => {
   const childWindow = new BrowserWindow({
-    webPreferences: {
-      preload
-    },
-  })
+                                          webPreferences: {
+                                            preload
+                                          },
+                                        })
 
   if (process.env.VITE_DEV_SERVER_URL) {
     childWindow.loadURL(`${url}#${arg}`)
@@ -157,9 +157,13 @@ ipcMain.on("open-devtools", (event) => {
   win?.webContents.setDevToolsWebContents(devtoolsWindow.webContents)
   win?.webContents.openDevTools({ mode: "detach" })
 
-  devtoolsWindow.setPosition(0, 0);
+  devtoolsWindow.setPosition(10, 30);
 
   devtoolsWindow.on("close", () => {
     devtoolsWindow = null
   })
+})
+
+ipcMain.on("restart-application", () => {
+  app.exit()
 })

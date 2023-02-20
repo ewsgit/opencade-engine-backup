@@ -6,14 +6,13 @@ function App() {
   const [ isLoading, setIsLoading ] = useState(true)
 
   useEffect(() => {
-    electronApi()
-        .setWindowControls({
-          titleBarOverlay: {
-            height: 0,
-            color: "#111827",
-            symbolColor: "#111827"
-          }
-        })
+    electronApi().setWindowControls({
+                                      titleBarOverlay: {
+                                        height: 0,
+                                        color: "#111827",
+                                        symbolColor: "#111827"
+                                      }
+                                    })
     setTimeout(() => {
       setIsLoading(false)
     }, 2000)
@@ -21,29 +20,27 @@ function App() {
 
   useEffect(() => {
     if (!isLoading) {
-      electronApi()
-          .setSize({
-            width: 1000,
-            height: 700,
-            animate: false
-          })
-      electronApi()
-          .setWindowControls({
-            titleBarOverlay: {
-              height: 29,
-              color: "#374151",
-              symbolColor: "#ffffff"
-            }
-          })
+      electronApi().setSize({
+                              width: 1000,
+                              height: 700,
+                              animate: false
+                            })
+      electronApi().setWindowControls({
+                                        titleBarOverlay: {
+                                          height: 29,
+                                          color: "#374151",
+                                          symbolColor: "#ffffff"
+                                        }
+                                      })
     }
   }, [ isLoading ])
 
   if (isLoading)
     return (
         <div
-            className={"bg-gray-900 w-full h-full flex items-center justify-center overflow-hidden"}>
+            className={"bg-gray-900 w-full h-full relative overflow-hidden"}>
           <div
-              className="w-full h-full transition-all select-none animate-fade-in"
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-max h-max transition-all select-none opacity-0 animate-fade-in animation-duration-2000"
               onClick={() => {
                 setIsLoading(false)
               }}>

@@ -29,6 +29,12 @@ const safeDOM = {
 }
 
 function Loader() {
+  ipcRenderer.send("set-size", {
+    width: 1000,
+    height: 700,
+    animate: false
+  })
+
   const className = `loader`
   const styleContent = `
 @keyframes square-spin {
@@ -97,7 +103,7 @@ window.onmessage = (ev) => {
 
 setTimeout(removeLoading, 1000)
 
-contextBridge.exposeInMainWorld('electron', <IElectronApi>{
+const Apis: IElectronApi = {
   setTitle: (title) => ipcRenderer.send('set-title', title),
   setSize: (params) => ipcRenderer.send("set-size", params),
   closeWindow: () => ipcRenderer.send("close-window"),
@@ -109,4 +115,7 @@ contextBridge.exposeInMainWorld('electron', <IElectronApi>{
   openDevTools: () => ipcRenderer.send("open-devtools"),
   setBackgroundTransparent: () => ipcRenderer.send("set-background-transparent"),
   setBackgroundSolid: () => ipcRenderer.send("set-background-solid"),
-})
+  restartApplication: () => ipcRenderer.send("restart-application")
+}
+
+contextBridge.exposeInMainWorld('electron', Apis)

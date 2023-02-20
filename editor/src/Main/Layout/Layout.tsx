@@ -10,7 +10,7 @@ export default function EditorLayout() {
     <section className={`grid w-full h-full grid-cols-[auto,1fr,auto]`}>
       <LeftSideBar/>
       <main><h1>Game Content View</h1></main>
-      <RightDetailsView/>
+      <RightDetailsView label={"test"} properties={[]}/>
     </section>
     <StatusBar/>
   </main>

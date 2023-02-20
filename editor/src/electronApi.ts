@@ -11,7 +11,8 @@ export interface IElectronApi {
   }) => void,
   openDevTools: () => void,
   setBackgroundTransparent: () => void
-  setBackgroundSolid: () => void
+  setBackgroundSolid: () => void,
+  restartApplication: () => void
 }
 
 export default function electronApi(): IElectronApi {
