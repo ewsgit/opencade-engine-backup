@@ -7,7 +7,7 @@ export default function EditorLayout() {
   return <main
       className={"w-full h-full bg-gray-900 overflow-hidden flex flex-col"}>
     <MenuBar/>
-    <section className={`grid w-full h-full grid-cols-[auto,1fr,auto]`}>
+    <section className={`grid w-full h-full grid-cols-[auto,1fr,auto] animate-fade-in animation-duration-500`}>
       <LeftSideBar/>
       <main><h1>Game Content View</h1></main>
       <RightDetailsView label={"test"} properties={[]}/>

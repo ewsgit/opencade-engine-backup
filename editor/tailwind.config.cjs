@@ -35,7 +35,7 @@ module.exports = {
                 const className = `.animation-duration-${name}`;
 
                 utilities[className] = {
-                    '--tw-animation-duration': duration,
+                    '--tw-animation-duration': `${duration}ms`,
                 };
             });
 

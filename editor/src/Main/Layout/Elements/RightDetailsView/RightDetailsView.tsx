@@ -1,7 +1,7 @@
 import ResizeHelper from "@/Main/Layout/Elements/ResizeHelper/ResizeHelper";
 import { type SceneNode } from "../../../../../types/SceneNode";
 
-export default function RightDetailsView(object: SceneNode) {
+export default function RightDetailsView(object: SceneNode<"leaf" | "parent">) {
   return <ResizeHelper onLeft={true}>
     <section
         className={"h-full bg-gray-800 h-full select-none text-white"}>

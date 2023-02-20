@@ -1,8 +1,10 @@
 import { type color } from "./color";
 
-export interface SceneNode {
+export interface SceneNode<Type extends "leaf" | "parent"> {
   label: string,
-  properties: SceneNodeProperty[]
+  properties: SceneNodeProperty[],
+  type: Type,
+  children?: Type extends "parent" ? SceneNode<"leaf" | "parent">[] : null;
 }
 
 export interface SceneNodeProperty {
