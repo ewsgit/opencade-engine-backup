@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ResizeHelper from "@/Main/Layout/Elements/ResizeHelper/ResizeHelper";
+import { SceneNode } from "../../../../../types/SceneNode";
 
 export default function LeftSideBar() {
   const [ selectedTab, setSelectedTab ] = useState(0)
@@ -146,5 +147,83 @@ function FileExplorerTab() {
 }
 
 function SceneNodesTab() {
-  return <div>Scene Nodes</div>
+
+  const [ sceneNodes, setSceneNodes ] = useState([] as SceneNode<"leaf" | "parent">[])
+
+  useState(() => {
+    setSceneNodes([
+                    {
+                      type: "parent",
+                      children: [
+                        {
+                          type: "leaf",
+                          children: null,
+                          properties: [],
+                          label: "leaf 1"
+                        }
+                      ],
+                      label: "parent 1",
+                      properties: []
+                    },
+                    {
+                      type: "parent",
+                      children: [
+                        {
+                          type: "parent",
+                          children: [
+                            {
+                              type: "parent",
+                              children: [
+                                {
+                                  type: "leaf",
+                                  children: null,
+                                  properties: [],
+                                  label: "leaf 1"
+                                },
+                                {
+                                  type: "leaf",
+                                  children: null,
+                                  properties: [],
+                                  label: "leaf 1"
+                                }
+                              ],
+                              label: "parent 1",
+                              properties: []
+                            }
+                          ],
+                          label: "parent 1",
+                          properties: []
+                        }
+                      ],
+                      label: "parent 1",
+                      properties: []
+                    }
+                  ])
+  })
+
+  function mapNodes(nodes: SceneNode<"leaf" | "parent">[]) {
+    return nodes.map(node => {
+      switch (node.type) {
+        case "leaf":
+          return <div>leaf</div>
+        case "parent":
+          if (!node.children) return <></>
+          return <div>
+            parent
+            {
+              mapNodes(node.children)
+            }
+          </div>
+      }
+    })
+  }
+
+  return <section>
+    <div className={"p-1 pl-2 text-lg"}>Scene Nodes</div>
+    <main>
+      {
+        mapNodes(sceneNodes)
+      }
+    </main>
+  </section>
 }
