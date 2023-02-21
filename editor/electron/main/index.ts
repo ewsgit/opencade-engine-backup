@@ -39,7 +39,7 @@ async function createWindow() {
                             width: 386,
                             height: 466,
                             titleBarStyle: "hidden",
-                            titleBarOverlay: true
+                            titleBarOverlay: true,
                           })
 
   win.removeMenu()
@@ -51,6 +51,17 @@ async function createWindow() {
 
   win.webContents.on('did-finish-load', () => {
     win?.webContents.send('main-process-message', new Date().toLocaleString())
+
+    // installExtension(
+    //     REACT_DEVELOPER_TOOLS,
+    //     {
+    //       loadExtensionOptions: {
+    //         allowFileAccess: true
+    //       }
+    //     }
+    // ).then(
+    //     (name) => console.log(`Added Extension:  ${name}`)).catch(
+    //     (err) => console.log('An error occurred: ', err));
   })
 
   // Make all links open with the browser, not with the application
@@ -60,7 +71,9 @@ async function createWindow() {
   })
 }
 
-app.whenReady().then(createWindow)
+app.whenReady().then(() => {
+  createWindow()
+})
 
 app.on('window-all-closed', () => {
   win = null
