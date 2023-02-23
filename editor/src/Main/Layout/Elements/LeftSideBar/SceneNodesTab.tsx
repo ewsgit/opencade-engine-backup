@@ -104,19 +104,26 @@ const ParentNode: React.FC<{
   return <div
       key={ node.label }
   >
-    <p
+    <div
         onClick={ () => {
           setSelectedSceneNode( node )
         } }
-        className={ "p-1 pl-2 bg-gray-800 hover:bg-gray-700 transition-colors cursor-pointer" }>
-      <span onClick={
-        (e) => {
-          e.stopPropagation()
-          setIsOpen( !isOpen )
-        }
-      }>
+        className={ "cursor-pointer p-0.5 flex" }>
+      <span
+          onClick={
+            (e) => {
+              e.stopPropagation()
+              setIsOpen( !isOpen )
+            }
+          }
+          className={ "bg-gray-800 hover:bg-gray-700 transition-colors p-1 w-6 text-center" }
+      >
         { isOpen ? "-" : "+" }
-      </span> { node.label }</p>
+      </span>
+      <div className={ "bg-gray-800 hover:bg-gray-700 transition-colors p-1 w-full pl-1.5" }>
+        { node.label }
+      </div>
+    </div>
     {
         isOpen && <div
             key={ node.label }

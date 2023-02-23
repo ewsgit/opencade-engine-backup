@@ -117,7 +117,12 @@ const Apis: IElectronApi = {
   openDevTools: () => ipcRenderer.send( "open-devtools" ),
   setBackgroundTransparent: () => ipcRenderer.send( "set-background-transparent" ),
   setBackgroundSolid: () => ipcRenderer.send( "set-background-solid" ),
-  restartApplication: () => ipcRenderer.send( "restart-application" )
+  restartApplication: () => ipcRenderer.send( "restart-application" ),
+  exitApplication: () => ipcRenderer.send( "exit-application" ),
+  loadProject: (params) => ipcRenderer.send( "load-project", params ),
+  createProject: (params) => ipcRenderer.send( "create-project", params ),
+  startDevServer: () => ipcRenderer.send( "start-dev-server" ),
+  stopDevServer: () => ipcRenderer.send( "stop-dev-server" ),
 }
 
 contextBridge.exposeInMainWorld( 'electron', Apis )

@@ -12,7 +12,12 @@ export interface IElectronApi {
   openDevTools: () => void,
   setBackgroundTransparent: () => void
   setBackgroundSolid: () => void,
-  restartApplication: () => void
+  restartApplication: () => void,
+  exitApplication: () => void,
+  loadProject: (params: { path: string }) => void,
+  createProject: (params: { path: string }) => void,
+  startDevServer: () => void,
+  stopDevServer: () => void,
 }
 
 export default function electronApi(): IElectronApi {

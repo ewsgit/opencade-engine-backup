@@ -9,5 +9,8 @@ export interface SceneNode<Type extends "leaf" | "parent"> {
 
 export interface SceneNodeProperty {
   label: string,
-  value: string | number | color
+  value: string | number | color | SceneNode<any>,
+  type: SceneNodePropertyValueType
 }
+
+export type SceneNodePropertyValueType = "string" | "number" | "color" | "sceneNode" | "script"
