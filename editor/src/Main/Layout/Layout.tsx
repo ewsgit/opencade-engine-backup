@@ -31,13 +31,13 @@ export default function EditorLayout() {
         />
         <section className={ `grid w-full h-full grid-cols-[auto,1fr,auto] animate-fade-in animation-duration-500` }>
           <SelectedSceneNodeContext.Provider
-              value={ (selectedNode: SceneNode<any>) => setSelectedSceneNode( selectedNode ) }>
+              value={ (selectedNode: SceneNode<any>) => setSelectedSceneNode( selectedNode ) }
+          >
             <LeftSideBar/>
             <main>
               {
-                // TODO: when isPlaying changes, if it is true then run the vite dev command inside the project using
-                //       a child process (show a starting up message), then load the game inside an electron webview or iframe
-                  isPlaying && <iframe src={ "http://localhost:5173" }></iframe>
+                // TODO: when isPlaying changes, if it is true then show a starting up message, then load the game inside an electron webview or iframe
+                  isPlaying && <iframe className={ "w-full h-full" } src={ "http://localhost:5173" }></iframe>
               }
             </main>
             <RightDetailsView

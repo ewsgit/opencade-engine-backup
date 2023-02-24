@@ -5,6 +5,10 @@ import fs from "fs";
 import * as child_process from "child_process";
 import * as path from "path";
 import { ExecaChildProcess } from "execa";
+// @ts-ignore
+import { Directory } from "../../types/FileManager/Directory.ts";
+// @ts-ignore
+import { File } from "../../types/FileManager/File.ts";
 
 import("execa").then( moduleExeca => {
 
@@ -285,5 +289,19 @@ import("execa").then( moduleExeca => {
     }
 
     DEV_PROCESS = null
+  } )
+
+  ipcMain.on( "read-path", (event) => {
+    ipcMain.emit(
+        "read-path-response",
+        [
+          {
+            path: "/a",
+            name: "a",
+            type: "file",
+            fileType: "js"
+          }
+        ] satisfies (File | Directory)[]
+    )
   } )
 } )

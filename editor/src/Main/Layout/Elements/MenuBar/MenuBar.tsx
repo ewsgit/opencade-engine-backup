@@ -1,5 +1,6 @@
 import electronApi from "@/electronApi";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { Directory } from "../../../../../types/FileManager/Directory";
 
 interface IMenuBar {
   onPlay: () => void,
@@ -49,16 +50,12 @@ const MenuBar: React.FC<IMenuBar> = ({ onPlay, onStop }) => {
     </div>
 
     {
-        showProjectSelectionPopup &&
-        <main
-            className={ "z-30 top-0 left-0 h-full w-full fixed flex items-center justify-center bg-black bg-opacity-30 select-none" }
-            onClick={ () => {
-              setShowProjectSelectionPopup( false )
-            } }
-        >
-            <div className={ "max-w-3xl max-h-[32rem] h-full w-full bg-gray-600" }
-                 onClick={ (e) => e.stopPropagation() }></div>
-        </main>
+        showProjectSelectionPopup && (
+            <ProjectSelectionPopup
+                setShowProjectSelectionPopup={ setShowProjectSelectionPopup }
+                showProjectSelectionPopup={ showProjectSelectionPopup }
+            />
+        )
     }
 
     <section
@@ -85,3 +82,71 @@ const MenuBar: React.FC<IMenuBar> = ({ onPlay, onStop }) => {
 }
 
 export default MenuBar
+
+interface IProjectSelectionPopup {
+  showProjectSelectionPopup: boolean,
+  setShowProjectSelectionPopup: (value: boolean) => void
+}
+
+const ProjectSelectionPopup: React.FC<IProjectSelectionPopup> = (
+    {
+      showProjectSelectionPopup,
+      setShowProjectSelectionPopup
+    }
+) => {
+  const [ selectedPath, setSelectedPath ] = useState( "/" )
+  const [ items, setItems ] = useState( [] as (File | Directory)[] )
+
+  useEffect( () => {
+    electronApi().readPath( { path: selectedPath } )
+  }, [ selectedPath ] )
+
+  useEffect( () => {
+    electronApi().readPathListener( (data) => {
+      console.log( data )
+      setItems( data )
+    } )
+  }, [] )
+
+  return (
+      <main
+          className={ "z-30 top-0 left-0 h-full w-full fixed flex items-center justify-center bg-black bg-opacity-30 select-none" }
+          onClick={ () => {
+            setShowProjectSelectionPopup( false )
+          } }
+      >
+        <div
+            className={ "max-w-3xl max-h-[32rem] h-full w-full bg-gray-600 grid grid-rows-[auto,1fr,auto]" }
+            onClick={ (e) => e.stopPropagation() }
+        >
+          <section>
+            { selectedPath }
+          </section>
+          <main>
+            {
+              items.map( item => {
+                switch (item.type) {
+                  case "directory":
+                    return <div>
+                      dir
+                    </div>
+                  case "file":
+                    return <div>
+                      file
+                    </div>
+                }
+              } )
+            }
+          </main>
+          <section className={ "bg-gray-800 w-full flex" }>
+            <button
+                onClick={ () => electronApi().loadProject( { path: selectedPath } ) }
+                className={ "ml-auto p-1 pl-2 pr-2 bg-gray-700 hover:bg-gray-600 active:bg-gray-500 transition-colors cursor-pointer text-white" }
+            >
+              Select
+            </button>
+          </section>
+        </div>
+      </main>
+  )
+}

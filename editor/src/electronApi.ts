@@ -1,4 +1,8 @@
 import Electron from "electron"
+// @ts-ignore
+import { type Directory } from "../types/FileManager/Directory.ts";
+// @ts-ignore
+import { type File } from "../types/FileManager/File.ts"
 
 export interface IElectronApi {
   setTitle: (title: string) => void,
@@ -18,6 +22,8 @@ export interface IElectronApi {
   createProject: (params: { path: string }) => void,
   startDevServer: () => void,
   stopDevServer: () => void,
+  readPath: (params: { path: string }) => void,
+  readPathListener: (cb: (props: (File | Directory)[]) => void) => void
 }
 
 export default function electronApi(): IElectronApi {

@@ -1,5 +1,9 @@
 import { contextBridge, ipcRenderer } from "electron"
 import { IElectronApi } from "../../src/electronApi";
+// @ts-ignore
+import { Directory } from "../../types/FileManager/Directory";
+// @ts-ignore
+import { File } from "../../types/FileManager/File";
 
 function domReady(condition: DocumentReadyState[] = [ 'complete', 'interactive' ]) {
   return new Promise( resolve => {
@@ -123,6 +127,10 @@ const Apis: IElectronApi = {
   createProject: (params) => ipcRenderer.send( "create-project", params ),
   startDevServer: () => ipcRenderer.send( "start-dev-server" ),
   stopDevServer: () => ipcRenderer.send( "stop-dev-server" ),
+  readPath: (params) => ipcRenderer.send( "read-path", params ),
+  readPathListener: (cb) => ipcRenderer.on(
+      "read-path-response", (event, args) => cb( args[0] as (File | Directory)[] )
+  )
 }
 
 contextBridge.exposeInMainWorld( 'electron', Apis )
