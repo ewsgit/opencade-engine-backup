@@ -30,11 +30,9 @@ export default defineConfig(({ command }) => {
         plugins: [
           ...(!!process.env.VSCODE_DEBUG
               ? [
-                // Will start Electron via VSCode Debug
-                customStart(debounce(() => console.log(/* For `.vscode/.debug.script.mjs` */'[startup] Electron App'))),
+                customStart(debounce(() => console.log('[startup] Electron App'))),
               ]
               : []),
-          // Allow use `import.meta.env.VITE_SOME_KEY` in Electron-Main
           loadViteEnv(),
         ],
       }),
