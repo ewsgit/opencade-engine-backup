@@ -1,57 +1,61 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import fs from "fs"
+import react from "@vitejs/plugin-react";
+import fs from "fs";
 import electron from "vite-electron-plugin";
 import * as path from "path";
-import { customStart, loadViteEnv } from 'vite-electron-plugin/plugin'
-import renderer from 'vite-plugin-electron-renderer'
+import { customStart, loadViteEnv } from "vite-electron-plugin/plugin";
+import renderer from "vite-plugin-electron-renderer";
+
+const { defineConfig } = await import("vite");
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command }) => {
-  fs.rmSync('dist-electron', { recursive: true, force: true })
+  fs.rmSync("dist-electron", { recursive: true, force: true });
 
-  const sourcemap = command === 'serve' || !!process.env.VSCODE_DEBUG
+  const sourcemap = command === "serve" || !!process.env.VSCODE_DEBUG;
 
   return {
     resolve: {
       alias: {
-        '@': path.join(__dirname, 'src')
+        "@": path.join(__dirname, "src"),
       },
     },
     plugins: [
       react(),
       electron({
-        include: [
-          'electron'
-        ],
+        include: ["electron"],
         transformOptions: {
           sourcemap,
         },
         plugins: [
           ...(!!process.env.VSCODE_DEBUG
-              ? [
-                customStart(debounce(() => console.log('[startup] Electron App'))),
+            ? [
+                customStart(
+                  debounce(() => console.log("[startup] Electron App")),
+                ),
               ]
-              : []),
+            : []),
           loadViteEnv(),
         ],
       }),
       renderer(),
     ],
     server: {
-      port: 5002
+      port: 5002,
     },
-    base: process.env.IS_DEV !== 'true' ? './' : '/',
+    base: process.env.IS_DEV !== "true" ? "./" : "/",
     build: {
-      outDir: 'app/build',
+      outDir: "app/build",
     },
-  }
-})
+  };
+});
 
-function debounce<Fn extends (...args: any[]) => void>(fn: Fn, delay = 299): Fn {
-  let t: NodeJS.Timeout
+function debounce<Fn extends (...args: any[]) => void>(
+  fn: Fn,
+  delay = 299,
+): Fn {
+  let t: NodeJS.Timeout;
   return ((...args: Parameters<Fn>) => {
-    clearTimeout(t)
-    t = setTimeout(() => fn(...args), delay)
-  }) as Fn
+    clearTimeout(t);
+    t = setTimeout(() => fn(...args), delay);
+  }) as Fn;
 }

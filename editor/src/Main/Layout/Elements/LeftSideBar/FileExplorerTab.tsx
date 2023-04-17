@@ -1,113 +1,133 @@
 import React, { useEffect, useState } from "react";
-import { ExplorerItem } from "@/Main/Layout/Elements/LeftSideBar/LeftSideBar";
 
-export default function FileExplorerTab() {
-  const [ items, setItems ] = useState( [] as ExplorerItem<"file" | "directory">[] )
+const FileExplorerTab: React.FC = () => {
+  const [projectRoot, setProjectRoot] = useState<string>(
+    "~/WebstormProjects/opencade-engine/demos/snake",
+  );
 
-  useEffect( () => {
-    setItems( [
-                {
-                  name: "package.json",
-                  type: "file",
-                  path: "/package.json",
-                  children: null
-                },
-                {
-                  name: "packages",
-                  type: "directory",
-                  path: "/packages/",
-                  children: [
-                    {
-                      name: "package22.json",
-                      type: "file",
-                      path: "/package22.json",
-                      children: null
-                    },
-                    {
-                      name: "package25.json",
-                      type: "file",
-                      path: "/package25.json",
-                      children: null
-                    },
-                    {
-                      name: "package28.json",
-                      type: "file",
-                      path: "/package28.json",
-                      children: null
-                    },
-                    {
-                      name: "packages",
-                      type: "directory",
-                      path: "/packages/",
-                      children: [
-                        {
-                          name: "package22.json",
-                          type: "file",
-                          path: "/package22.json",
-                          children: null
-                        },
-                        {
-                          name: "package25.json",
-                          type: "file",
-                          path: "/package25.json",
-                          children: null
-                        },
-                        {
-                          name: "package28.json",
-                          type: "file",
-                          path: "/package28.json",
-                          children: null
-                        },
-                      ]
-                    }
-                  ]
-                }
-              ] )
-  }, [] )
+  return <Directory path={projectRoot} />;
+};
 
-  return <>
-    <h3 className={ "w-full p-2 pt-1 pb-1 text-lg" }>Project files</h3>
-    {
-      mapItems( items )
-    }
-  </>
-}
+const FileExplorerFile: React.FC<{ name: string; path: string }> = ({
+  name,
+  path,
+}) => {
+  return (
+    <div
+      className={`hover:bg-gray-700 active:bg-gray-800 pl-2 pr-2`}
+      onClick={() => {
+        fetch(`http://localhost:5001/project/file/open`, {
+          method: "POST",
+          body: JSON.stringify({ path: path }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+      }}
+    >
+      {name}
+    </div>
+  );
+};
 
-function mapItems(items: ExplorerItem<"file" | "directory">[]) {
-  return items.map( item => {
-    switch (item.type) {
-      case "file":
-        return <div
-            key={ item.path }
-            className={ "bg-gray-800 transition-colors hover:bg-gray-500 pl-2 pr-2 p-1" }>
-          <span className={ "pr-2" }>{ item.name }</span>
-        </div>
-      case "directory":
-        return <Directory key={ item.path } item={ item }/>
-    }
-  } )
-}
-
-const Directory: React.FC<{ item: ExplorerItem<"file" | "directory"> }> = ({ item }) => {
-  const [ isOpen, setIsOpen ] = useState( false )
-
-  if (item.children === null) return <></>
+const FileExplorerDirectory: React.FC<{ name: string; path: string }> = ({
+  name,
+  path,
+}) => {
+  const [children, setChildren] = useState<
+    { name: string; type: "dir" | "file" }[] | null
+  >(null);
 
   return (
+    <>
       <div
-          key={ item.path }
-          className={ "bg-gray-800 transition-colors hover:bg-gray-600 w-full h-max" }
-      >
-        <p onClick={ () => setIsOpen( !isOpen ) }
-           className={ "p-1 pl-2 pr-2 pr-0 w-full" }>{ isOpen ? "-" : "+" } { item.name }</p>
-        { isOpen && <div
-            className={ "border-l-2 border-l-orange-400 bg-gray-800 pl-1 ml-2" }
-        >
-          {
-            mapItems( item.children )
+        onClick={() => {
+          if (children === null) {
+            fetch(`http://localhost:5001/project/files`, {
+              method: "POST",
+              body: JSON.stringify({ path: path }),
+              headers: {
+                "Content-Type": "application/json",
+              },
+            })
+              .then((resp) => resp.json())
+              .then((json) => setChildren(json));
+          } else {
+            setChildren(null);
           }
-        </div>
-        }
+        }}
+        className={`hover:bg-gray-700 active:bg-gray-800 pl-2 pr-2`}
+      >
+        {(children ? "- " : "+ ") + name}
       </div>
-  )
-}
+      <div className={`pl-2`}>
+        {children &&
+          children.map((child) => {
+            switch (child.type) {
+              case "dir":
+                return (
+                  <FileExplorerDirectory
+                    key={child.name}
+                    name={child.name}
+                    path={`${path}/${child.name}`}
+                  />
+                );
+              case "file":
+                return (
+                  <FileExplorerFile
+                    key={child.name}
+                    name={child.name}
+                    path={`${path}/${child.name}`}
+                  />
+                );
+            }
+          })}
+      </div>
+    </>
+  );
+};
+
+export default FileExplorerTab;
+
+const Directory: React.FC<{ path: string }> = ({ path }) => {
+  const [items, setItems] = useState<{ name: string; type: "dir" | "file" }[]>(
+    [],
+  );
+
+  useEffect(() => {
+    fetch(`http://localhost:5001/project/files`, {
+      method: "POST",
+      body: JSON.stringify({ path: "" }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((resp) => resp.json())
+      .then((json) => setItems(json));
+  }, [path]);
+
+  return (
+    <div className={`flex flex-col h-full overflow-auto`}>
+      {items.map((item) => {
+        switch (item.type) {
+          case "dir":
+            return (
+              <FileExplorerDirectory
+                key={item.name}
+                name={item.name}
+                path={`${item.name}`}
+              />
+            );
+          case "file":
+            return (
+              <FileExplorerFile
+                key={item.name}
+                name={item.name}
+                path={`${item.name}`}
+              />
+            );
+        }
+      })}
+    </div>
+  );
+};

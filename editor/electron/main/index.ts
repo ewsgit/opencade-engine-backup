@@ -1,68 +1,62 @@
-import { app, BrowserWindow, ipcMain, shell } from 'electron'
-import { release } from 'node:os'
-import { join } from 'node:path'
-import fs from "fs";
-import * as child_process from "child_process";
-import * as path from "path";
+import { app, BrowserWindow, ipcMain, shell } from "electron";
+import { release } from "node:os";
+import { join } from "node:path";
 import { ExecaChildProcess } from "execa";
-// @ts-ignore
-import { Directory } from "../../types/FileManager/Directory.ts";
-// @ts-ignore
-import { File } from "../../types/FileManager/File.ts";
+import { type Directory } from "../../types/FileManager/Directory.js";
+import { type File } from "../../types/FileManager/File.js";
+import backend from "./backend.js";
 
-import("execa").then( moduleExeca => {
+import("execa").then((moduleExeca) => {
+  const execa = moduleExeca.execa;
 
-  const execa = moduleExeca.execa
-
-  process.env.DIST_ELECTRON = join( __dirname, '../' )
-  process.env.DIST = join( process.env.DIST_ELECTRON, '../dist' )
+  process.env.DIST_ELECTRON = join(__dirname, "../");
+  process.env.DIST = join(process.env.DIST_ELECTRON, "../dist");
   process.env.PUBLIC = process.env.VITE_DEV_SERVER_URL
-      ? join( process.env.DIST_ELECTRON, '../public' )
-      : process.env.DIST
+    ? join(process.env.DIST_ELECTRON, "../public")
+    : process.env.DIST;
 
-// Disable GPU Acceleration for Windows 7
-  if (release().startsWith( '6.1' )) app.disableHardwareAcceleration()
-
-// Set application name for Windows 10+ notifications
-  if (process.platform === 'win32') app.setAppUserModelId( app.getName() )
+  if (release().startsWith("6.1")) app.disableHardwareAcceleration();
+  if (process.platform === "win32") app.setAppUserModelId(app.getName());
 
   if (!app.requestSingleInstanceLock()) {
-    app.quit()
-    process.exit( 0 )
+    app.quit();
+    process.exit(0);
   }
 
-  process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
+  process.env["ELECTRON_DISABLE_SECURITY_WARNINGS"] = "true";
 
-  let win: BrowserWindow | null = null
-  const preload = join( __dirname, '../preload/index.js' )
-  const url = process.env.VITE_DEV_SERVER_URL
-  const indexHtml = join( process.env.DIST, 'index.html' )
+  let win: BrowserWindow | null = null;
+  const preload = join(__dirname, "../preload/index.js");
+  const url = process.env.VITE_DEV_SERVER_URL;
+  const indexHtml = join(process.env.DIST, "index.html");
 
   async function createWindow() {
-    win = new BrowserWindow( {
-                               title: 'Main window',
-                               icon: join( process.env.PUBLIC, 'favicon.ico' ),
-                               webPreferences: {
-                                 preload,
-                                 plugins: true,
-                                 contextIsolation: true,
-                               },
-                               center: true,
-                               width: 386,
-                               height: 466,
-                               titleBarStyle: "hidden",
-                               titleBarOverlay: true,
-                             } )
+    win = new BrowserWindow({
+      title: "Main window",
+      icon: join(process.env.PUBLIC, "favicon.ico"),
+      webPreferences: {
+        preload,
+        plugins: true,
+        contextIsolation: true,
+      },
+      center: true,
+      titleBarStyle: "hidden",
+      titleBarOverlay: true,
+      backgroundColor: "#374151",
+    });
 
-    win.removeMenu()
+    win.removeMenu();
     if (process.env.VITE_DEV_SERVER_URL) {
-      win.loadURL( url )
+      win.loadURL(url);
     } else {
-      win.loadFile( indexHtml )
+      win.loadFile(indexHtml);
     }
 
-    win.webContents.on( 'did-finish-load', () => {
-      win?.webContents.send( 'main-process-message', new Date().toLocaleString() )
+    win.webContents.on("did-finish-load", () => {
+      win?.webContents.send(
+        "main-process-message",
+        new Date().toLocaleString(),
+      );
 
       // installExtension(
       //     REACT_DEVELOPER_TOOLS,
@@ -74,234 +68,133 @@ import("execa").then( moduleExeca => {
       // ).then(
       //     (name) => console.log(`Added Extension:  ${name}`)).catch(
       //     (err) => console.log('An error occurred: ', err));
-    } )
+    });
 
     // Make all links open with the browser, not with the application
-    win.webContents.setWindowOpenHandler( ({ url }) => {
-      if (url.startsWith( 'https:' )) shell.openExternal( url )
-      return { action: 'deny' }
-    } )
+    win.webContents.setWindowOpenHandler(({ url }) => {
+      if (url.startsWith("https:")) shell.openExternal(url);
+      return { action: "deny" };
+    });
   }
 
-  app.whenReady().then( () => {
-    createWindow()
-  } )
+  app.whenReady().then(() => {
+    createWindow();
+  });
 
-  app.on( 'window-all-closed', () => {
-    win = null
-    if (process.platform !== 'darwin') app.quit()
-  } )
+  app.on("window-all-closed", () => {
+    win = null;
+    if (process.platform !== "darwin") app.quit();
+  });
 
-  app.on( 'second-instance', () => {
+  app.on("second-instance", () => {
     if (win) {
       // Focus on the main window if the user tried to open another
-      if (win.isMinimized()) win.restore()
-      win.focus()
+      if (win.isMinimized()) win.restore();
+      win.focus();
     }
-  } )
+  });
 
-  app.on( 'activate', () => {
-    const allWindows = BrowserWindow.getAllWindows()
+  app.on("activate", () => {
+    const allWindows = BrowserWindow.getAllWindows();
     if (allWindows.length) {
-      allWindows[0].focus()
+      allWindows[0].focus();
     } else {
-      createWindow()
+      createWindow();
     }
-  } )
+  });
 
-// New window example arg: new windows url
-  ipcMain.handle( 'open-win', (_, arg) => {
-    const childWindow = new BrowserWindow( {
-                                             webPreferences: {
-                                               preload
-                                             },
-                                           } )
+  // New window example arg: new windows url
+  ipcMain.handle("open-win", (_, arg) => {
+    const childWindow = new BrowserWindow({
+      webPreferences: {
+        preload,
+      },
+    });
 
     if (process.env.VITE_DEV_SERVER_URL) {
-      childWindow.loadURL( `${ url }#${ arg }` )
+      childWindow.loadURL(`${url}#${arg}`);
     } else {
-      childWindow.loadFile( indexHtml, { hash: arg } )
+      childWindow.loadFile(indexHtml, { hash: arg });
     }
-  } )
+  });
 
-  ipcMain.on( "set-title", (event, title) => {
-    const webContents = event.sender
-    const win = BrowserWindow.fromWebContents( webContents )
+  ipcMain.on("set-title", (event, title) => {
+    const webContents = event.sender;
+    const win = BrowserWindow.fromWebContents(webContents);
 
-    win?.setTitle( title )
-  } )
+    win?.setTitle(title);
+  });
 
-  ipcMain.on( "set-size", (event, params) => {
-    const webContents = event.sender
-    const win = BrowserWindow.fromWebContents( webContents )
+  ipcMain.on("set-window-controls", (event, params) => {
+    const webContents = event.sender;
+    const win = BrowserWindow.fromWebContents(webContents);
 
-    win?.setSize( params.width, params.height, params.animate )
-  } )
+    win?.setTitleBarOverlay(params?.titleBarOverlay);
+  });
 
-  ipcMain.on( "set-window-controls", (event, params) => {
-    const webContents = event.sender
-    const win = BrowserWindow.fromWebContents( webContents )
+  ipcMain.on("close-window", (event, params) => {
+    const webContents = event.sender;
+    const win = BrowserWindow.fromWebContents(webContents);
 
-    win?.setTitleBarOverlay( params?.titleBarOverlay )
-  } )
+    win?.close();
+  });
 
-  ipcMain.on( "close-window", (event, params) => {
-    const webContents = event.sender
-    const win = BrowserWindow.fromWebContents( webContents )
+  ipcMain.on("toggle-maximized", (event) => {
+    const webContents = event.sender;
+    const win = BrowserWindow.fromWebContents(webContents);
 
-    win?.close()
-  } )
+    if (!win?.isMaximized()) return win?.maximize();
 
-  ipcMain.on( "toggle-maximized", (event) => {
-    const webContents = event.sender
-    const win = BrowserWindow.fromWebContents( webContents )
+    win?.unmaximize();
+  });
 
-    if (!win?.isMaximized())
-      return win?.maximize()
+  ipcMain.on("minimize", (event) => {
+    const webContents = event.sender;
+    const win = BrowserWindow.fromWebContents(webContents);
 
-    win?.unmaximize()
-  } )
+    win?.minimize();
+  });
 
-  ipcMain.on( "minimize", (event) => {
-    const webContents = event.sender
-    const win = BrowserWindow.fromWebContents( webContents )
+  let devtoolsWindow = <null | Electron.BrowserWindow>null;
 
-    win?.minimize()
-  } )
+  ipcMain.on("open-devtools", (event) => {
+    const webContents = event.sender;
+    const win = BrowserWindow.fromWebContents(webContents);
 
-  let devtoolsWindow = <null | Electron.BrowserWindow>null
+    if (devtoolsWindow) return devtoolsWindow.focus();
 
-  ipcMain.on( "open-devtools", (event) => {
-    const webContents = event.sender
-    const win = BrowserWindow.fromWebContents( webContents )
+    devtoolsWindow = new BrowserWindow();
 
-    if (devtoolsWindow) return devtoolsWindow.focus()
+    win?.webContents.setDevToolsWebContents(devtoolsWindow.webContents);
+    win?.webContents.openDevTools({ mode: "detach" });
 
-    devtoolsWindow = new BrowserWindow()
+    devtoolsWindow.setPosition(10, 30);
 
-    win?.webContents.setDevToolsWebContents( devtoolsWindow.webContents )
-    win?.webContents.openDevTools( { mode: "detach" } )
+    devtoolsWindow.on("close", () => {
+      devtoolsWindow = null;
+    });
+  });
 
-    devtoolsWindow.setPosition( 10, 30 );
+  ipcMain.on("restart-application", () => {
+    app.exit();
+  });
 
-    devtoolsWindow.on( "close", () => {
-      devtoolsWindow = null
-    } )
-  } )
+  ipcMain.on("exit-application", () => {
+    app.exit();
+  });
 
-  ipcMain.on( "restart-application", () => {
-    app.exit()
-  } )
+  let DEV_PROCESS: ExecaChildProcess | null = null;
 
-  ipcMain.on( "exit-application", () => {
-    app.exit()
-  } )
+  ipcMain.on("read-path", (event) => {
+    ipcMain.emit("read-path-response", [
+      {
+        path: "/a",
+        name: "a",
+        type: "file",
+        fileType: "js",
+      },
+    ] satisfies (File | Directory)[]);
+  });
 
-  let CURRENT_PROJECT_PATH = "./../demos/snake/"
-
-  ipcMain.on( "load-project", (event, params) => {
-    const projectPath = params.path
-
-    if (!fs.existsSync( projectPath ))
-      return
-
-    CURRENT_PROJECT_PATH = projectPath
-  } )
-
-  ipcMain.on( "create-project", (event, params) => {
-    const projectPath = params.path
-
-    if (!fs.existsSync( projectPath ))
-      return
-
-    CURRENT_PROJECT_PATH = projectPath
-  } )
-
-  let DEV_PROCESS: ExecaChildProcess | null = null
-
-  ipcMain.on( "start-dev-server", () => {
-    if (DEV_PROCESS !== null) return
-
-    if (!fs.existsSync( path.resolve( `${ CURRENT_PROJECT_PATH }`, `./node_modules/` ) ))
-      child_process.exec( `npm install`, { cwd: path.resolve( CURRENT_PROJECT_PATH ) }, (error, stdout, stderr) => {
-        if (!error) {
-          return
-        }
-      } )
-
-    if (process.platform === "win32") {
-      DEV_PROCESS = execa(
-          `npm.cmd`, [ "run", "dev" ],
-          { cwd: path.resolve( CURRENT_PROJECT_PATH ) }
-      )
-    } else {
-      DEV_PROCESS = execa(
-          `npm`, [ "run", "dev" ],
-          { cwd: path.resolve( CURRENT_PROJECT_PATH ) }
-      )
-    }
-
-    DEV_PROCESS.on( "message", (msg) => {
-      console.log( `DevServer: ${ msg }` )
-    } )
-
-    DEV_PROCESS.on( "error", (err) => {
-      console.log( `DevServer ERROR: ${ err }` )
-    } )
-
-    DEV_PROCESS.on( "exit", (code, a) => {
-      console.log( `DevServer exited with code ${ code }` )
-    } )
-
-  } )
-
-  ipcMain.on( "stop-dev-server", () => {
-    if (DEV_PROCESS === null) return
-
-    if (process.platform === "win32") {
-      execa(
-          `npx.cmd`, [ "kill-port", "5173", "--yes" ],
-          { cwd: path.resolve( CURRENT_PROJECT_PATH ) }
-      )
-    } else {
-      execa(
-          `npx`, [ "kill-port", "5173", "--yes" ],
-          { cwd: path.resolve( CURRENT_PROJECT_PATH ) }
-      )
-    }
-
-    DEV_PROCESS = null
-  } )
-
-  app.on( "quit", () => {
-    if (DEV_PROCESS === null) return
-
-    if (process.platform === "win32") {
-      execa(
-          `npx.cmd`, [ "kill-port", "5173", "--yes" ],
-          { cwd: path.resolve( CURRENT_PROJECT_PATH ) }
-      )
-    } else {
-      execa(
-          `npx`, [ "kill-port", "5173", "--yes" ],
-          { cwd: path.resolve( CURRENT_PROJECT_PATH ) }
-      )
-    }
-
-    DEV_PROCESS = null
-  } )
-
-  ipcMain.on( "read-path", (event) => {
-    ipcMain.emit(
-        "read-path-response",
-        [
-          {
-            path: "/a",
-            name: "a",
-            type: "file",
-            fileType: "js"
-          }
-        ] satisfies (File | Directory)[]
-    )
-  } )
-} )
+  backend();
+});
