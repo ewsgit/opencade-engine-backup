@@ -1,11 +1,14 @@
 import react from "@vitejs/plugin-react";
 import fs from "fs";
+import { defineConfig } from "vite";
 import electron from "vite-electron-plugin";
 import * as path from "path";
-import { customStart, loadViteEnv } from "vite-electron-plugin/plugin";
+import {
+  customStart,
+  esmodule,
+  loadViteEnv,
+} from "vite-electron-plugin/plugin";
 import renderer from "vite-plugin-electron-renderer";
-
-const { defineConfig } = await import("vite");
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command }) => {
@@ -35,6 +38,7 @@ export default defineConfig(({ command }) => {
               ]
             : []),
           loadViteEnv(),
+          esmodule({ include: ["open", "execa"] }),
         ],
       }),
       renderer(),

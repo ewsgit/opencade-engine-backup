@@ -132,15 +132,16 @@ const ProjectSelectionPopup: React.FC<IProjectSelectionPopup> = ({
   const [items, setItems] = useState([] as (File | Directory)[]);
 
   useEffect(() => {
-    electronApi().readPath({ path: selectedPath });
+    fetch("http://localhost:5001/open-project/list/files", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ path: selectedPath }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        setItems(res);
+      });
   }, [selectedPath]);
-
-  useEffect(() => {
-    electronApi().readPathListener((data) => {
-      console.log(data);
-      setItems(data);
-    });
-  }, []);
 
   return (
     <main
@@ -161,7 +162,7 @@ const ProjectSelectionPopup: React.FC<IProjectSelectionPopup> = ({
         <main>
           {items.map((item) => {
             switch (item.type) {
-              case "directory":
+              case "dir":
                 return <div>dir</div>;
               case "file":
                 return <div>file</div>;

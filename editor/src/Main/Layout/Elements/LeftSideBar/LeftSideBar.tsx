@@ -15,7 +15,7 @@ const LEFT_SIDEBAR_TABS: { label: string; content: React.ReactNode }[] = [
 ];
 
 export default function LeftSideBar() {
-  const [selectedTab, setSelectedTab] = useState<string | null>("Explorer");
+  const [ selectedTab, setSelectedTab ] = useState<string | null>("Explorer");
 
   return (
     <ResizeHelper onLeft={false}>
@@ -29,11 +29,10 @@ export default function LeftSideBar() {
             return (
               <span
                 key={tab.label}
-                className={`w-max [writing-mode:vertical-rl;] transition-all rotate-180 pt-2 pb-2 p-0.5 cursor-pointer ${
-                  selectedTab === tab.label
+                className={`w-max [writing-mode:vertical-rl;] transition-all rotate-180 pt-2 pb-2 p-0.5 cursor-pointer ${selectedTab === tab.label
                     ? "bg-gray-300 text-black"
                     : "bg-gray-600"
-                }`}
+                  }`}
                 onClick={() => {
                   if (selectedTab === tab.label) {
                     setSelectedTab(null);
@@ -68,6 +67,6 @@ export interface ExplorerItem<Type extends "directory" | "file"> {
   type: Type;
   name: string;
   children: Type extends "directory"
-    ? ExplorerItem<"directory" | "file">[]
-    : null;
+  ? ExplorerItem<"directory" | "file">[]
+  : null;
 }

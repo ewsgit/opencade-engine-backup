@@ -1,12 +1,12 @@
 import { getCanvas, getContext, setupCanvas } from "./canvas";
 import Game from "./game";
 
-const text = `🕹️ FreeCade Engine`
+const text = `🕹️ FreeCade Engine`;
 let animationProgress = 1;
 
 // @ts-ignore
 export default function initializeEngine(callback: (game: Game) => void) {
-  const game = new Game()
+  const game = new Game();
   setupCanvas(game);
 
   let interval = setInterval(() => {
@@ -19,30 +19,20 @@ export default function initializeEngine(callback: (game: Game) => void) {
 
       ctx.fillStyle = "#222";
       ctx.fillRect(0, 0, width, height);
-
       ctx.fillStyle = "#aaa";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
 
+      ctx.font = "48px Segoe Ui";
 
-      ctx.textAlign = "center"
-      ctx.textBaseline = "middle"
+      ctx.fillText(text, width / 2, height / 2);
 
-      ctx.font = "48px Segoe Ui"
+      ctx.fillRect(25, height - 75, width - 50, 50);
+      callback(game);
 
-      ctx.fillText(text, width / 2, height / 2)
-
-      ctx.fillRect(
-          25,
-          height - 75,
-          width - 50,
-          50
-      );
-      setTimeout(() => {
-        callback(game);
-
-        return game.__internal__beginRenderCycle()
-      }, 1000)
+      return game.__internal__beginRenderCycle();
     }
-  }, 25);
+  }, 5);
 }
 
 function drawFrame() {
@@ -57,17 +47,17 @@ function drawFrame() {
 
   ctx.fillStyle = "#aaa1";
 
-  ctx.textAlign = "center"
-  ctx.textBaseline = "middle"
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
 
-  ctx.font = "48px Segoe Ui"
+  ctx.font = "48px Segoe Ui";
 
-  ctx.fillText(text, width / 2, height / 2)
+  ctx.fillText(text, width / 2, height / 2);
 
   ctx.fillRect(
-      25,
-      height - (25 + 50),
-      animationProgress * ((width - 50) / 100),
-      50
+    25,
+    height - (25 + 50),
+    animationProgress * ((width - 50) / 100),
+    50
   );
 }

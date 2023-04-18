@@ -6,6 +6,8 @@ import sh from "shell-exec";
 import fs from "fs";
 
 export default async function main() {
+  const open = (await import("open")).default;
+
   const express = ExpressJS();
 
   express.use(cors());
@@ -57,8 +59,31 @@ export default async function main() {
     CURRENT_PROJECT_PATH = req.body.path || path.resolve("./../demos/snake/");
   });
 
-  express.post(`/project/file/open`, (req, res) => {
-    open(path.resolve(CURRENT_PROJECT_PATH, req.body.path));
+  express.post(`/open-project/list/files`, (req, res) => {
+    const { path: reqPath } = req.body;
+
+    fs.readdir(path.resolve(reqPath), (err, data) => {
+      if (err) return res.json([]);
+
+      return res.json(
+        data.map((item) =>
+          fs.lstatSync(path.resolve(reqPath, item)).isFile()
+            ? {
+                name: item,
+                type: "file",
+              }
+            : { name: item, type: "dir" },
+        ),
+      );
+    });
+  });
+
+  express.post(`/project/file/open`, async (req, res) => {
+    try {
+      await open(path.resolve(CURRENT_PROJECT_PATH, req.body.path));
+    } catch (err) {
+      return res.json({ success: false });
+    }
     return res.json({ success: true });
   });
 
@@ -66,6 +91,8 @@ export default async function main() {
     fs.readdir(
       path.resolve(CURRENT_PROJECT_PATH, req.body.path),
       (err, data) => {
+        if (err) return res.json([]);
+
         return res.json(
           data.map((item) =>
             fs
