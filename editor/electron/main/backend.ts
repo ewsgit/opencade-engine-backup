@@ -57,6 +57,8 @@ export default async function main() {
 
   express.post(`/project/open`, (req, res) => {
     CURRENT_PROJECT_PATH = req.body.path || path.resolve("./../demos/snake/");
+
+    return res.json({ error: true });
   });
 
   express.post(`/open-project/list/files`, (req, res) => {
@@ -66,14 +68,23 @@ export default async function main() {
       if (err) return res.json([]);
 
       return res.json(
-        data.map((item) =>
-          fs.lstatSync(path.resolve(reqPath, item)).isFile()
-            ? {
-                name: item,
-                type: "file",
-              }
-            : { name: item, type: "dir" },
-        ),
+        data.map((item) => {
+          try {
+            return fs.lstatSync(path.resolve(reqPath, item)).isFile()
+              ? {
+                  name: item,
+                  type: "file",
+                  path: req.body.path + item,
+                }
+              : {
+                  name: item,
+                  type: "dir",
+                  path: req.body.path + item,
+                };
+          } catch (e) {
+            return false;
+          }
+        }),
       );
     });
   });

@@ -78,7 +78,6 @@ const MenuBar: React.FC<IMenuBar> = ({ onPlay, onStop }) => {
       {showProjectSelectionPopup && (
         <ProjectSelectionPopup
           setShowProjectSelectionPopup={setShowProjectSelectionPopup}
-          showProjectSelectionPopup={showProjectSelectionPopup}
         />
       )}
 
@@ -120,12 +119,25 @@ const MenuBar: React.FC<IMenuBar> = ({ onPlay, onStop }) => {
 export default MenuBar;
 
 interface IProjectSelectionPopup {
-  showProjectSelectionPopup: boolean;
   setShowProjectSelectionPopup: (value: boolean) => void;
 }
 
+const ProjectSelectionPopupDirectory: React.FC<{
+  name: string;
+  path: string;
+  setPath: (path: string) => void;
+}> = ({ name, path, setPath }) => {
+  return (
+    <div
+      onClick={() => setPath(path)}
+      className={`pl-2 pt-1 pb-1 pr-2 text-white bg-gray-800 hover:bg-gray-700 active:bg-gray-600`}
+    >
+      {name}
+    </div>
+  );
+};
+
 const ProjectSelectionPopup: React.FC<IProjectSelectionPopup> = ({
-  showProjectSelectionPopup,
   setShowProjectSelectionPopup,
 }) => {
   const [selectedPath, setSelectedPath] = useState("/");
@@ -158,20 +170,45 @@ const ProjectSelectionPopup: React.FC<IProjectSelectionPopup> = ({
         }
         onClick={(e) => e.stopPropagation()}
       >
-        <section>{selectedPath}</section>
-        <main>
+        <main className={`overflow-auto`}>
+          {selectedPath !== "/" && (
+            <ProjectSelectionPopupDirectory
+              path={".."}
+              name={".."}
+              key={".."}
+              setPath={() => {
+                setSelectedPath(
+                  selectedPath.lastIndexOf("/") !== -1
+                    ? selectedPath.slice(0, selectedPath.lastIndexOf("/"))
+                    : "/",
+                );
+              }}
+            ></ProjectSelectionPopupDirectory>
+          )}
           {items.map((item) => {
-            switch (item.type) {
-              case "dir":
-                return <div>dir</div>;
-              case "file":
-                return <div>file</div>;
-            }
+            if (item.type === "dir")
+              return (
+                <ProjectSelectionPopupDirectory
+                  path={item.path}
+                  name={item.name}
+                  key={item.name}
+                  setPath={(value) => {
+                    setSelectedPath(value);
+                  }}
+                ></ProjectSelectionPopupDirectory>
+              );
           })}
         </main>
-        <section className={"bg-gray-800 w-full flex"}>
+        <section className={"bg-gray-800 w-full flex text-white"}>
+          <span className={`pl-1 mb-auto mt-auto`}>{selectedPath}</span>
           <button
-            onClick={() => electronApi().loadProject({ path: selectedPath })}
+            onClick={() => {
+              fetch(`http://localhost:5001/project/open`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ path: selectedPath }),
+              });
+            }}
             className={
               "ml-auto p-1 pl-2 pr-2 bg-gray-700 hover:bg-gray-600 active:bg-gray-500 transition-colors cursor-pointer text-white"
             }
