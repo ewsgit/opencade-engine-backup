@@ -1,12 +1,52 @@
 import React, { useEffect, useState } from "react";
+import Icon from "@/components/icon/Icon";
 
-const FileExplorerTab: React.FC = () => {
+export interface IFileExplorerTab {
+  setCurrentTab: (value: "Edit" | "Preview") => {};
+}
+
+const FileExplorerTab: React.FC<IFileExplorerTab> = ({ setCurrentTab }) => {
   const [projectRoot, setProjectRoot] = useState<string>(
     "~/WebstormProjects/opencade-engine/demos/snake",
   );
 
-  return <Directory path={projectRoot} />;
+  return (
+    <div className={"min-h-full grid grid-rows-[auto,1fr]"}>
+      <section className="w-full bg-gray-700 flex">
+        <span className={"mr-auto mt-auto mb-auto pl-2"}>Explorer</span>
+        <button
+          type={"button"}
+          onClick={() => {
+            fetch(`http://localhost:5001/project/files/open-in-explorer`);
+          }}
+          className={
+            "aspect-square bg-gray-700 hover:bg-gray-600 active:bg-gray-500 h-8 p-1.5 flex"
+          }
+        >
+          <Icon
+            name={"file-directory-16"}
+            className={"text-white h-full w-full"}
+          ></Icon>
+        </button>
+      </section>
+      <Directory path={projectRoot} />
+    </div>
+  );
 };
+
+const HANDLED_FILE_EXTENSIONS: {
+  name: string;
+  onOpen: (name: string, path: string) => void;
+}[] = [
+  {
+    name: "ocscene",
+    onOpen: (name: string, path: string) => {
+      return console.log(
+        "detected ocscene file, ignoring regular file-opening behaviour",
+      );
+    },
+  },
+];
 
 const FileExplorerFile: React.FC<{ name: string; path: string }> = ({
   name,
@@ -16,6 +56,11 @@ const FileExplorerFile: React.FC<{ name: string; path: string }> = ({
     <div
       className={`hover:bg-gray-700 active:bg-gray-800 pl-2 pr-2`}
       onClick={() => {
+        for (let i = 0; i < HANDLED_FILE_EXTENSIONS.length; i++) {
+          if (name.endsWith(HANDLED_FILE_EXTENSIONS[i].name))
+            return HANDLED_FILE_EXTENSIONS[i].onOpen(name, path);
+        }
+
         fetch(`http://localhost:5001/project/file/open`, {
           method: "POST",
           body: JSON.stringify({ path: path }),

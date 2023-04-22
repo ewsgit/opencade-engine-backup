@@ -58,7 +58,7 @@ export default async function main() {
   express.post(`/project/open`, (req, res) => {
     CURRENT_PROJECT_PATH = req.body.path || path.resolve("./../demos/snake/");
 
-    return res.json({ error: true });
+    return res.json({ success: true });
   });
 
   express.post(`/open-project/list/files`, (req, res) => {
@@ -79,7 +79,7 @@ export default async function main() {
               : {
                   name: item,
                   type: "dir",
-                  path: req.body.path + item,
+                  path: req.body.path + item + "/",
                 };
           } catch (e) {
             return false;
@@ -120,6 +120,16 @@ export default async function main() {
         );
       },
     );
+  });
+
+  express.get(`/project/files/open-in-explorer`, (req, res) => {
+    sh(`explorer.exe ${CURRENT_PROJECT_PATH}`);
+
+    return res.json({ success: true });
+  });
+
+  express.get(`/project/name`, (req, res) => {
+    return res.json({ name: "error" });
   });
 
   express.listen(5001, () => {
