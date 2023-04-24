@@ -23,11 +23,11 @@ const OpenProjectPopupDirectory: React.FC<{
 const OpenProjectPopup: React.FC<IOpenProjectPopup> = ({
   setShowOpenProjectPopup,
 }) => {
-  const [selectedPath, setSelectedPath] = useState("/");
+  const [selectedPath, setSelectedPath] = useState<string>("");
   const [items, setItems] = useState([] as (File | Directory)[]);
 
   useEffect(() => {
-    if (selectedPath === "") return setSelectedPath("/");
+    if (selectedPath === "") return setSelectedPath("");
 
     fetch("http://localhost:5001/open-project/list/files", {
       method: "POST",
@@ -89,7 +89,9 @@ const OpenProjectPopup: React.FC<IOpenProjectPopup> = ({
             "bg-gray-800 w-full flex text-white rounded-b-xl overflow-hidden"
           }
         >
-          <span className={`pl-2 mb-auto mt-auto`}>{selectedPath}</span>
+          <span className={`pl-2 mb-auto mt-auto`}>
+            {selectedPath !== "" ? selectedPath : "/"}
+          </span>
           <button
             onClick={() => {
               fetch(`http://localhost:5001/project/open`, {

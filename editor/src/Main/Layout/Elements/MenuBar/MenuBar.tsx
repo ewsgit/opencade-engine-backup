@@ -1,11 +1,13 @@
 import electronApi from "@/electronApi";
-import React, { useEffect, useState } from "react";
-import { Directory } from "../../../../../types/FileManager/Directory";
+import React, { useState } from "react";
 import OpenProjectPopup from "./OpenProjectMenu";
 
-interface IMenuBar {}
+interface IMenuBar {
+  activeTab: "Edit" | "Preview";
+  setActiveTab: (value: "Edit" | "Preview") => void;
+}
 
-const MenuBar: React.FC<IMenuBar> = () => {
+const MenuBar: React.FC<IMenuBar> = ({ activeTab, setActiveTab }) => {
   const [showFileMenu, setShowFileMenu] = useState(false);
   const [showProjectSelectionPopup, setShowProjectSelectionPopup] =
     useState(false);
@@ -72,7 +74,7 @@ const MenuBar: React.FC<IMenuBar> = () => {
         )}
       </div>
 
-      <MenuBarTabs />
+      <MenuBarTabs selectedTab={activeTab} setSelectedTab={setActiveTab} />
 
       {showProjectSelectionPopup && (
         <OpenProjectPopup
@@ -87,7 +89,10 @@ const MenuBar: React.FC<IMenuBar> = () => {
 
 export default MenuBar;
 
-const MenuBarTabs: React.FC<{}> = () => {
+const MenuBarTabs: React.FC<{
+  selectedTab: "Edit" | "Preview";
+  setSelectedTab: (value: "Edit" | "Preview") => void;
+}> = ({ selectedTab, setSelectedTab }) => {
   return (
     <div
       style={{
@@ -97,20 +102,38 @@ const MenuBarTabs: React.FC<{}> = () => {
       className={"left-1/2 -translate-x-1/2 absolute h-full"}
     >
       <button
+        onClick={() => {
+          setSelectedTab("Edit");
+        }}
         className={
-          "pl-2 pr-2 h-full bg-gray-700 hover:bg-gray-600 active:bg-gray-500 text-white"
+          "pl-2 pr-2 h-full bg-gray-700 hover:bg-gray-600 active:bg-gray-500 text-white relative"
         }
       >
         <span>Edit</span>
-        <div className={"w-full rounded-full h-0.5 bg-orange-400"}></div>
+        {selectedTab === "Edit" && (
+          <div
+            className={
+              "w-full rounded-full h-0.5 bg-orange-400 animate__animated animate__zoomIn animate__faster absolute bottom-0 left-0"
+            }
+          ></div>
+        )}
       </button>
       <button
+        onClick={() => {
+          setSelectedTab("Preview");
+        }}
         className={
-          "pl-2 pr-2 h-full bg-gray-700 hover:bg-gray-600 active:bg-gray-500 text-white"
+          "pl-2 pr-2 h-full bg-gray-700 hover:bg-gray-600 active:bg-gray-500 text-white relative"
         }
       >
         <span>Preview</span>
-        <div className={"w-full rounded-full h-0.5 bg-orange-400"}></div>
+        {selectedTab === "Preview" && (
+          <div
+            className={
+              "w-full rounded-full h-0.5 bg-orange-400 animate__animated animate__zoomIn animate__faster absolute bottom-0 left-0"
+            }
+          ></div>
+        )}
       </button>
     </div>
   );

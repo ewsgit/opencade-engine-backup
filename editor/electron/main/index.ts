@@ -172,7 +172,8 @@ ipcMain.on("open-devtools", (event) => {
 });
 
 ipcMain.on("restart-application", () => {
-  app.exit();
+  app.relaunch();
+  app.quit();
 });
 
 ipcMain.on("exit-application", () => {

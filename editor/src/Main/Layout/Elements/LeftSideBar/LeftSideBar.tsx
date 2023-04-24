@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import ResizeHelper from "@/Main/Layout/Elements/ResizeHelper/ResizeHelper";
-import FileExplorerTab from "./FileExplorerTab";
 
 const LeftSideBar: React.FC<{
   tabs: { label: string; content: React.ReactNode }[];
@@ -64,4 +63,4 @@ export interface ExplorerItem<Type extends "directory" | "file"> {
     : null;
 }
 
-export default FileExplorerTab;
+export default LeftSideBar;

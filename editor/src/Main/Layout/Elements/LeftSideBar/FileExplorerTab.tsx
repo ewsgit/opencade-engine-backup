@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Icon from "@/components/icon/Icon";
 
 export interface IFileExplorerTab {
-  setCurrentTab: (value: "Edit" | "Preview") => {};
+  setCurrentTab: (value: "Edit" | "Preview") => void;
 }
 
 const FileExplorerTab: React.FC<IFileExplorerTab> = ({ setCurrentTab }) => {

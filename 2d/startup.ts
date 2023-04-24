@@ -1,7 +1,7 @@
 import { getCanvas, getContext, setupCanvas } from "./canvas";
 import Game from "./game";
 
-const text = `🕹️ FreeCade Engine`;
+const text = `🕹️ OpenCade Engine`;
 let animationProgress = 1;
 
 // @ts-ignore

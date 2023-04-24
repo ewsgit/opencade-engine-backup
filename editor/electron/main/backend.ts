@@ -64,7 +64,7 @@ export default async function main() {
   express.post(`/open-project/list/files`, (req, res) => {
     const { path: reqPath } = req.body;
 
-    fs.readdir(path.resolve(reqPath), (err, data) => {
+    fs.readdir(path.resolve("/" + reqPath), (err, data) => {
       if (err) return res.json([]);
 
       return res.json(
@@ -79,7 +79,7 @@ export default async function main() {
               : {
                   name: item,
                   type: "dir",
-                  path: req.body.path + item + "/",
+                  path: req.body.path + "/" + item,
                 };
           } catch (e) {
             return false;

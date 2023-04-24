@@ -52,7 +52,7 @@ function App() {
               "text-6xl font-semibold text-center text-white p-8 pb-0 pt-0 -mt-12"
             }
           >
-            FreeCade
+            OpenCade
           </h2>
           <p
             className={
