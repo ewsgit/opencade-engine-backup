@@ -42,7 +42,7 @@ export default function init(containerElement: HTMLDivElement) {
 
   scene.add(mesh);
 
-  new EngineObject().addToScene(scene);
+  new EngineObject().addToScene(scene).position().setX(2);
 
   let light = new THREE.PointLight("#55a6ff", 1);
   light.position.set(0, 2, 0);
