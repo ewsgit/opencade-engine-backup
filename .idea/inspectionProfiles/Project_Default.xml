@@ -1,7 +1,6 @@
 <component name="InspectionProjectProfileManager">
   <profile version="1.0">
     <option name="myName" value="Project Default" />
-    <inspection_tool class="AnonymousFunctionJS" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="AssignmentResultUsedJS" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="AssignmentToForLoopParameterJS" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="AssignmentToFunctionParameterJS" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -71,7 +70,6 @@
       <option name="m_minLength" value="1" />
       <option name="m_maxLength" value="32" />
     </inspection_tool>
-    <inspection_tool class="MagicNumberJS" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="NegatedConditionalExpressionJS" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="NegatedIfStatementJS" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="NestedAssignmentJS" enabled="true" level="WARNING" enabled_by_default="true" />

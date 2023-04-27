@@ -44,12 +44,6 @@ export default function init(containerElement: HTMLDivElement) {
 
   new EngineObject().addToScene(scene).position().setX(2);
 
-  let light = new THREE.PointLight("#55a6ff", 1);
-  light.position.set(0, 2, 0);
-  light.scale.set(2, 2, 2);
-
-  scene.add(light);
-
   scene.add(new THREE.HemisphereLight("#55a6ff", "#333333", 1));
 
   const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -68,14 +62,22 @@ export default function init(containerElement: HTMLDivElement) {
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.update();
 
-  renderer.setAnimationLoop(animate);
-
-  function animate(time: number) {
-    // required if controls.enableDamping or controls.autoRotate are set to true
-    controls.update();
-
-    renderer.render(scene, camera);
-  }
+  renderer.setAnimationLoop((time: number) =>
+    animate(time, camera, scene, controls, renderer)
+  );
 
   containerElement.appendChild(renderer.domElement);
+}
+
+function animate(
+  time: number,
+  camera: THREE.Camera,
+  scene: THREE.Scene,
+  controls: OrbitControls,
+  renderer: THREE.Renderer
+) {
+  // required if controls.enableDamping or controls.autoRotate are set to true
+  controls.update();
+
+  renderer.render(scene, camera);
 }
