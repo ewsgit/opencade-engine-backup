@@ -72,10 +72,6 @@ export default class EnginePlayerController extends EngineStaticController {
     this.mouseX += e.movementX;
     this.mouseY += e.movementY;
 
-    let rotX = this.mouseX / 1000;
-    let rotY = this.mouseY / 1000;
-
-    this.camera.rotation.y = this.mouseX * -1;
-    this.camera.rotation.z = this.mouseY * -1;
+    // TODO: map mouse movement to camera rotation
   };
 }
