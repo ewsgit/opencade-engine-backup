@@ -15,6 +15,10 @@ export default class Engine {
   renderer: THREE.Renderer;
 
   constructor(containerElement: HTMLDivElement) {
+    Array.from(containerElement.children).forEach((element) => {
+      element.remove();
+    });
+
     const containerBounds = containerElement.getBoundingClientRect();
 
     this.width = containerBounds.width;

@@ -5,11 +5,17 @@ export default class EngineStaticController {
   protected domElement: HTMLCanvasElement;
   protected camera: Camera;
   protected controllerType: string = "static";
+  protected tick: () => void;
 
   constructor(camera: Camera, domElement: HTMLCanvasElement) {
     this.domElement = domElement;
     this.camera = camera;
     this.canMove = true;
+    this.tick = () => {};
+
+    setInterval(() => {
+      this.tick();
+    }, 5);
 
     // check and warn if another controller has already been registered
     if (this.domElement.getAttribute("OC-controller")) {
