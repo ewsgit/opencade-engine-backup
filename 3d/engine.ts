@@ -1,18 +1,18 @@
 import * as THREE from "three";
-import { PerspectiveCamera, Scene } from "three";
+import { Scene } from "three";
 // @ts-ignore
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import EngineObject from "./object";
-import EnginePlayerController from "./core/controller/player";
-
-const CAMERA_FIELD_OF_VIEW = 90;
+import EngineEditorController from "./core/controller/editor";
+import ImageObject from "./core/objects/Image";
+import Camera from "./core/camera/camera";
 
 export default class Engine {
-  camera: PerspectiveCamera;
+  camera: Camera;
   readonly width: number;
   readonly height: number;
   scene: Scene;
-  renderer: THREE.Renderer;
+  renderer: THREE.WebGLRenderer;
 
   constructor(containerElement: HTMLDivElement) {
     Array.from(containerElement.children).forEach((element) => {
@@ -24,18 +24,17 @@ export default class Engine {
     this.width = containerBounds.width;
     this.height = containerBounds.height;
 
-    this.camera = new PerspectiveCamera(
-      CAMERA_FIELD_OF_VIEW,
-      this.width / this.height
-    );
-    this.camera.position.set(1, 1, 1);
+    this.camera = new Camera();
 
     this.scene = new Scene();
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    this.renderer.setPixelRatio(window.devicePixelRatio);
     this.renderer.setSize(this.width, this.height);
+    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.type = THREE.PCFShadowMap;
 
-    new EnginePlayerController(this.camera, this.renderer.domElement);
+    new EngineEditorController(this.camera, this.renderer.domElement, this);
 
     new ResizeObserver(() => {
       const containerBounds = containerElement.getBoundingClientRect();
@@ -48,13 +47,22 @@ export default class Engine {
 
     this.scene.background = new THREE.Color(0x001122);
 
-    let light = new THREE.HemisphereLight("#0077aa", "#246942");
-
-    this.scene.add(light);
-
     new EngineObject()
       .setGeometry(new THREE.BoxGeometry(10, 0, 10))
       .addToScene(this.scene);
+
+    let light = new THREE.AmbientLight(0xffffff, 0.25);
+    light.position.set(0, 0.25, 0);
+
+    this.scene.add(light);
+
+    new EngineObject().addToScene(this.scene);
+
+    new ImageObject()
+      .addToScene(this.scene)
+      .snapToCamera(this.camera)
+      .position()
+      .setX(-2);
 
     animate(this.scene, this.camera, this.renderer);
     return this;

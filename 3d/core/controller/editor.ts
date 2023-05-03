@@ -3,8 +3,8 @@ import * as Three from "three";
 import Engine from "../../engine";
 import Camera from "../camera/camera";
 
-export default class EnginePlayerController extends EngineStaticController {
-  controllerType = "player";
+export default class EngineEditorController extends EngineStaticController {
+  controllerType = "editor";
   keysDown: { [key: string]: boolean } = {};
   mouseX: number = 0;
   mouseY: number = 0;
@@ -19,37 +19,29 @@ export default class EnginePlayerController extends EngineStaticController {
     this.tick = () => {
       if (!this.canMove) return;
 
-      let keys = Object.keys(this.keysDown);
-
-      if (keys.includes("w") || keys.includes("ArrowUp")) {
+      if (this.keysDown["w"] || this.keysDown["arrowup"]) {
         this.camera.translateZ(-0.1);
       }
       if (
-        (keys.includes("w") || keys.includes("ArrowUp")) &&
-        keys.includes("Control")
+        (this.keysDown["w"] || this.keysDown["arrowup"]) &&
+        this.keysDown["control"]
       ) {
         this.camera.translateZ(-0.1);
       }
-      if (keys.includes("s") || keys.includes("ArrowDown")) {
+      if (this.keysDown["s"] || this.keysDown["arrowdown"]) {
         this.camera.translateZ(0.1);
       }
-      if (keys.includes("a") || keys.includes("ArrowLeft")) {
+      if (this.keysDown["a"] || this.keysDown["arrowleft"]) {
         this.camera.translateX(-0.1);
       }
-      if (keys.includes("d") || keys.includes("ArrowRight")) {
+      if (this.keysDown["d"] || this.keysDown["arrowlight"]) {
         this.camera.translateX(0.1);
       }
-      if (keys.includes(" ")) {
+      if (this.keysDown[" "]) {
         this.camera.position.y += 0.05;
       }
-      if (keys.includes("Shift")) {
+      if (this.keysDown["shift"]) {
         this.camera.position.y -= 0.05;
-      }
-      if (this.camera.position.y > 1) {
-        this.camera.position.y -= 0.01;
-      }
-      if (this.camera.position.y < 1) {
-        this.camera.position.y = 1;
       }
     };
   }
@@ -60,17 +52,15 @@ export default class EnginePlayerController extends EngineStaticController {
     this.domElement.tabIndex = 2;
     this.domElement.focus({ preventScroll: true });
     this.domElement.addEventListener("keydown", (e) => {
-      if (this.keysDown[e.key]) {
+      if (this.keysDown[e.key.toLowerCase()]) {
         return;
       }
-      this.keysDown[e.key] = true;
+      this.keysDown[e.key.toLowerCase()] = true;
     });
     this.domElement.addEventListener("keyup", (e) => {
-      if (this.keysDown[e.key]) {
-        delete this.keysDown[e.key];
-      }
+      this.keysDown[e.key.toLowerCase()] = false;
     });
-    this.domElement.addEventListener("click", async () => {
+    this.domElement.addEventListener("auxclick", async () => {
       if (!document.pointerLockElement) {
         // @ts-ignore
         await this.domElement.requestPointerLock({
@@ -85,7 +75,7 @@ export default class EnginePlayerController extends EngineStaticController {
           this.canMove = true;
           document.addEventListener("mousemove", this.mouseMoveListener, false);
           document.addEventListener("mouseup", (e) => {
-            if (e.button === 0) {
+            if (e.button === 2) {
               document.exitPointerLock();
             }
           });
@@ -97,7 +87,7 @@ export default class EnginePlayerController extends EngineStaticController {
             false
           );
           document.removeEventListener("mouseup", (e) => {
-            if (e.button === 0) {
+            if (e.button === 2) {
               document.exitPointerLock();
             }
           });

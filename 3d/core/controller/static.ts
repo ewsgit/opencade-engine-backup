@@ -1,4 +1,5 @@
-import { Camera } from "three";
+import Camera from "./../camera/camera";
+import Engine from "../../engine";
 
 export default class EngineStaticController {
   protected canMove: boolean;
@@ -6,11 +7,13 @@ export default class EngineStaticController {
   protected camera: Camera;
   protected controllerType: string = "static";
   protected tick: () => void;
+  protected currentEngine: Engine;
 
-  constructor(camera: Camera, domElement: HTMLCanvasElement) {
+  constructor(camera: Camera, domElement: HTMLCanvasElement, engine: Engine) {
     this.domElement = domElement;
     this.camera = camera;
     this.canMove = true;
+    this.currentEngine = engine;
     this.tick = () => {};
 
     setInterval(() => {
