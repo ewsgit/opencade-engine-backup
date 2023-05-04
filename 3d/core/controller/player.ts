@@ -21,35 +21,35 @@ export default class EnginePlayerController extends EngineStaticController {
 
       let keys = Object.keys(this.keysDown);
 
-      if (keys.includes("w") || keys.includes("ArrowUp")) {
+      if (keys.includes("w") || keys.includes("arrowup")) {
         this.camera.translateZ(-0.1);
       }
       if (
-        (keys.includes("w") || keys.includes("ArrowUp")) &&
-        keys.includes("Control")
+        (keys.includes("w") || keys.includes("arrowup")) &&
+        keys.includes("control")
       ) {
         this.camera.translateZ(-0.1);
       }
-      if (keys.includes("s") || keys.includes("ArrowDown")) {
+      if (keys.includes("s") || keys.includes("arrowdown")) {
         this.camera.translateZ(0.1);
       }
-      if (keys.includes("a") || keys.includes("ArrowLeft")) {
+      if (keys.includes("a") || keys.includes("arrowleft")) {
         this.camera.translateX(-0.1);
       }
-      if (keys.includes("d") || keys.includes("ArrowRight")) {
+      if (keys.includes("d") || keys.includes("arrowright")) {
         this.camera.translateX(0.1);
       }
       if (keys.includes(" ")) {
-        this.camera.position.y += 0.05;
+        this.camera.position().y += 0.05;
       }
-      if (keys.includes("Shift")) {
-        this.camera.position.y -= 0.05;
+      if (keys.includes("shift")) {
+        this.camera.position().y -= 0.05;
       }
-      if (this.camera.position.y > 1) {
-        this.camera.position.y -= 0.01;
+      if (this.camera.position().y > 1) {
+        this.camera.position().y -= 0.01;
       }
-      if (this.camera.position.y < 1) {
-        this.camera.position.y = 1;
+      if (this.camera.position().y < 1) {
+        this.camera.position().y = 1;
       }
     };
   }
@@ -114,7 +114,7 @@ export default class EnginePlayerController extends EngineStaticController {
     const movementY = e.movementY || e.mozMovementY || e.webkitMovementY || 0;
 
     const camera = this.camera;
-    this._euler.setFromQuaternion(camera.quaternion);
+    this._euler.setFromQuaternion(camera.getObject().quaternion);
 
     this._euler.y -= movementX * 0.002 * this.sensitivity;
     this._euler.x -= movementY * 0.002 * this.sensitivity;
@@ -124,6 +124,6 @@ export default class EnginePlayerController extends EngineStaticController {
       Math.min(Math.PI / 2, this._euler.x)
     );
 
-    camera.quaternion.setFromEuler(this._euler);
+    camera.setQuaternionFromEuler(this._euler);
   };
 }

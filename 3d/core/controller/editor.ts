@@ -34,14 +34,14 @@ export default class EngineEditorController extends EngineStaticController {
       if (this.keysDown["a"] || this.keysDown["arrowleft"]) {
         this.camera.translateX(-0.1);
       }
-      if (this.keysDown["d"] || this.keysDown["arrowlight"]) {
+      if (this.keysDown["d"] || this.keysDown["arrowright"]) {
         this.camera.translateX(0.1);
       }
       if (this.keysDown[" "]) {
-        this.camera.position.y += 0.05;
+        this.camera.position().y += 0.05;
       }
       if (this.keysDown["shift"]) {
-        this.camera.position.y -= 0.05;
+        this.camera.position().y -= 0.05;
       }
     };
   }
@@ -104,7 +104,7 @@ export default class EngineEditorController extends EngineStaticController {
     const movementY = e.movementY || e.mozMovementY || e.webkitMovementY || 0;
 
     const camera = this.camera;
-    this._euler.setFromQuaternion(camera.quaternion);
+    this._euler.setFromQuaternion(camera.getObject().quaternion);
 
     this._euler.y -= movementX * 0.002 * this.sensitivity;
     this._euler.x -= movementY * 0.002 * this.sensitivity;
@@ -114,6 +114,6 @@ export default class EngineEditorController extends EngineStaticController {
       Math.min(Math.PI / 2, this._euler.x)
     );
 
-    camera.quaternion.setFromEuler(this._euler);
+    camera.setQuaternionFromEuler(this._euler);
   };
 }

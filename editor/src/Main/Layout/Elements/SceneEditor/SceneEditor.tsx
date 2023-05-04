@@ -15,11 +15,6 @@ const SceneEditor: React.FC<ISceneEditor> = ({ scenePath }) => {
     }
 
     const engine = new Engine(ref.current);
-
-    const { scene } = engine;
-
-    new EngineObject().addToScene(scene).position().set(2, 0, 0);
-    new EngineObject().addToScene(scene).position().set(0, 2, 0);
   }, []);
 
   return (

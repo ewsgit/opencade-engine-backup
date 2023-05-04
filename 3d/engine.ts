@@ -6,6 +6,11 @@ import EngineObject from "./object";
 import EngineEditorController from "./core/controller/editor";
 import ImageObject from "./core/objects/Image";
 import Camera from "./core/camera/camera";
+import EnginePlayerController from "./core/controller/player";
+
+const IS_DEV_MODE = false;
+
+export { IS_DEV_MODE };
 
 export default class Engine {
   camera: Camera;
@@ -24,7 +29,7 @@ export default class Engine {
     this.width = containerBounds.width;
     this.height = containerBounds.height;
 
-    this.camera = new Camera();
+    this.camera = new Camera(this);
 
     this.scene = new Scene();
 
@@ -34,12 +39,17 @@ export default class Engine {
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFShadowMap;
 
-    new EngineEditorController(this.camera, this.renderer.domElement, this);
+    if (IS_DEV_MODE) {
+      new EngineEditorController(this.camera, this.renderer.domElement, this);
+    } else {
+      new EnginePlayerController(this.camera, this.renderer.domElement, this);
+    }
 
     new ResizeObserver(() => {
       const containerBounds = containerElement.getBoundingClientRect();
-      this.camera.aspect = containerBounds.width / containerBounds.height;
-      this.camera.updateProjectionMatrix();
+      this.camera.getObject().aspect =
+        containerBounds.width / containerBounds.height;
+      this.camera.getObject().updateProjectionMatrix();
       this.renderer.setSize(containerBounds.width, containerBounds.height);
     }).observe(containerElement);
 
@@ -64,7 +74,7 @@ export default class Engine {
       .position()
       .setX(-2);
 
-    animate(this.scene, this.camera, this.renderer);
+    animate(this.scene, this.camera.getObject(), this.renderer);
     return this;
   }
 }

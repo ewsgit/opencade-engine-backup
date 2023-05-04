@@ -42,6 +42,12 @@ export default class EngineObject extends MeshLessObject {
     return this;
   }
 
+  setTexture(texture: Three.Texture): this {
+    this.material = new Three.MeshPhongMaterial({ map: texture });
+
+    return this;
+  }
+
   getGeometry(geometry: Three.BufferGeometry): Three.BufferGeometry {
     return geometry;
   }
