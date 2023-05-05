@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from "react";
 import Engine from "../../../../../../3d/engine";
-import EngineObject from "../../../../../../3d/object";
 
 export interface ISceneEditor {
   scenePath: string;
@@ -15,6 +14,8 @@ const SceneEditor: React.FC<ISceneEditor> = ({ scenePath }) => {
     }
 
     const engine = new Engine(ref.current);
+
+    engine.enableDevMode();
   }, []);
 
   return (

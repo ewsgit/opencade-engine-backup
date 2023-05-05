@@ -1,17 +1,23 @@
 import EngineObject from "../../object";
+import Tex from "./../../core/camera/camera.png";
 import * as THREE from "three";
 import Camera from "../camera/camera";
-import { texture } from "three/examples/jsm/nodes/shadernode/ShaderNodeBaseElements";
-// import Tex from "./../../../demos/untitled/assets/person.png";
-import * as Three from "three";
 
 export default class ImageObject extends EngineObject {
   constructor() {
     super();
 
-    // this.setMaterial(
-    //   new Three.MeshPhongMaterial({ map: new THREE.TextureLoader().load(Tex) })
-    // );
+    this.setGeometry(new THREE.PlaneGeometry());
+
+    let tex = new THREE.TextureLoader().load(Tex);
+
+    tex.magFilter = THREE.NearestFilter;
+
+    this.setMaterial(
+      new THREE.MeshPhongMaterial({ map: tex, transparent: true })
+    );
+
+    this.position().setY(1);
   }
 
   snapToCamera(camera: Camera): this {

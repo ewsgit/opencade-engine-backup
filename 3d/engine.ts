@@ -8,23 +8,51 @@ import ImageObject from "./core/objects/Image";
 import Camera from "./core/camera/camera";
 import EnginePlayerController from "./core/controller/player";
 
-const IS_DEV_MODE = false;
+let IS_DEV_MODE = false;
 
 export { IS_DEV_MODE };
 
 export default class Engine {
   camera: Camera;
-  readonly width: number;
-  readonly height: number;
+  width: number;
+  height: number;
   scene: Scene;
   renderer: THREE.WebGLRenderer;
+  elementContainer: HTMLDivElement;
+  // @ts-ignore
+  gameElementContainer: HTMLDivElement;
+  // @ts-ignore
+  uiElementContainer: HTMLDivElement;
 
   constructor(containerElement: HTMLDivElement) {
-    Array.from(containerElement.children).forEach((element) => {
+    this.elementContainer = containerElement;
+    this.width = 250;
+    this.height = 250;
+    this.camera = new Camera(this);
+    this.scene = new Scene();
+    this.renderer = new THREE.WebGLRenderer();
+    this.init();
+    return this;
+  }
+
+  init() {
+    Array.from(this.elementContainer.children).forEach((element) => {
       element.remove();
     });
 
-    const containerBounds = containerElement.getBoundingClientRect();
+    this.gameElementContainer = document.createElement("div");
+    this.gameElementContainer.setAttribute("data-opencade-game", "");
+    this.uiElementContainer = document.createElement("div");
+    this.uiElementContainer.setAttribute("data-opencade-ui", "");
+    this.uiElementContainer.style.position = "relative";
+    this.uiElementContainer.style.width = "100%";
+    this.uiElementContainer.style.height = "100%";
+    this.uiElementContainer.style.overflow = "hidden";
+
+    this.elementContainer.appendChild(this.gameElementContainer);
+    this.elementContainer.appendChild(this.uiElementContainer);
+
+    const containerBounds = this.elementContainer.getBoundingClientRect();
 
     this.width = containerBounds.width;
     this.height = containerBounds.height;
@@ -46,14 +74,14 @@ export default class Engine {
     }
 
     new ResizeObserver(() => {
-      const containerBounds = containerElement.getBoundingClientRect();
+      const containerBounds = this.elementContainer.getBoundingClientRect();
       this.camera.getObject().aspect =
         containerBounds.width / containerBounds.height;
       this.camera.getObject().updateProjectionMatrix();
       this.renderer.setSize(containerBounds.width, containerBounds.height);
-    }).observe(containerElement);
+    }).observe(this.elementContainer);
 
-    containerElement.appendChild(this.renderer.domElement);
+    this.gameElementContainer.appendChild(this.renderer.domElement);
 
     this.scene.background = new THREE.Color(0x001122);
 
@@ -75,6 +103,17 @@ export default class Engine {
       .setX(-2);
 
     animate(this.scene, this.camera.getObject(), this.renderer);
+  }
+
+  enableDevMode(): this {
+    IS_DEV_MODE = true;
+    this.init();
+    return this;
+  }
+
+  disableDevMode(): this {
+    IS_DEV_MODE = true;
+    this.init();
     return this;
   }
 }
