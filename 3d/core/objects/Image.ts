@@ -1,20 +1,21 @@
 import EngineObject from "../../object";
-import Tex from "./../../core/camera/camera.png";
 import * as THREE from "three";
 import Camera from "../camera/camera";
 
 export default class ImageObject extends EngineObject {
-  constructor() {
+  constructor(texturePath: string, useNearestNeighbour?: boolean) {
     super();
 
     this.setGeometry(new THREE.PlaneGeometry());
 
-    let tex = new THREE.TextureLoader().load(Tex);
+    let texture = new THREE.TextureLoader().load(texturePath);
 
-    tex.magFilter = THREE.NearestFilter;
+    if (useNearestNeighbour) {
+      texture.magFilter = THREE.NearestFilter;
+    }
 
     this.setMaterial(
-      new THREE.MeshPhongMaterial({ map: tex, transparent: true })
+      new THREE.MeshPhongMaterial({ map: texture, transparent: true })
     );
 
     this.position().setY(1);

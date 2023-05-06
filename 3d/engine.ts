@@ -7,6 +7,7 @@ import EngineEditorController from "./core/controller/editor";
 import ImageObject from "./core/objects/Image";
 import Camera from "./core/camera/camera";
 import EnginePlayerController from "./core/controller/player";
+import EngineUi from "./core/ui/ui";
 
 let IS_DEV_MODE = false;
 
@@ -35,6 +36,10 @@ export default class Engine {
     return this;
   }
 
+  getEngineUi(): EngineUi {
+    return new EngineUi(this.uiElementContainer);
+  }
+
   init() {
     Array.from(this.elementContainer.children).forEach((element) => {
       element.remove();
@@ -42,13 +47,22 @@ export default class Engine {
 
     this.gameElementContainer = document.createElement("div");
     this.gameElementContainer.setAttribute("data-opencade-game", "");
+    this.gameElementContainer.style.position = "absolute";
+    this.gameElementContainer.style.top = "0px";
+    this.gameElementContainer.style.left = "0px";
+    this.gameElementContainer.style.width = "100%";
+
     this.uiElementContainer = document.createElement("div");
     this.uiElementContainer.setAttribute("data-opencade-ui", "");
-    this.uiElementContainer.style.position = "relative";
+    this.uiElementContainer.style.position = "absolute";
+    this.uiElementContainer.style.top = "0px";
+    this.uiElementContainer.style.left = "0px";
     this.uiElementContainer.style.width = "100%";
     this.uiElementContainer.style.height = "100%";
     this.uiElementContainer.style.overflow = "hidden";
+    this.uiElementContainer.style.pointerEvents = "none";
 
+    this.elementContainer.style.position = "relative";
     this.elementContainer.appendChild(this.gameElementContainer);
     this.elementContainer.appendChild(this.uiElementContainer);
 
@@ -95,12 +109,6 @@ export default class Engine {
     this.scene.add(light);
 
     new EngineObject().addToScene(this.scene);
-
-    new ImageObject()
-      .addToScene(this.scene)
-      .snapToCamera(this.camera)
-      .position()
-      .setX(-2);
 
     animate(this.scene, this.camera.getObject(), this.renderer);
   }
