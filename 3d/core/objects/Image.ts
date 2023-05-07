@@ -3,10 +3,15 @@ import * as THREE from "three";
 import Camera from "../camera/camera";
 
 export default class ImageObject extends EngineObject {
-  constructor(texturePath: string, useNearestNeighbour?: boolean) {
+  constructor(
+    width: number,
+    height: number,
+    texturePath: string,
+    useNearestNeighbour?: boolean
+  ) {
     super();
 
-    this.setGeometry(new THREE.PlaneGeometry());
+    this.setGeometry(new THREE.PlaneGeometry(width, height));
 
     let texture = new THREE.TextureLoader().load(texturePath);
 
@@ -14,9 +19,21 @@ export default class ImageObject extends EngineObject {
       texture.magFilter = THREE.NearestFilter;
     }
 
+    texture.offset.set(0.5, 0.5);
+    texture.repeat.set(512, 512);
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+
     this.setMaterial(
-      new THREE.MeshPhongMaterial({ map: texture, transparent: true })
+      new THREE.MeshPhongMaterial({
+        map: texture,
+        transparent: true,
+        specular: 0x111111,
+        shininess: 10,
+      })
     );
+
+    this.getMaterial().side = THREE.DoubleSide;
 
     this.position().setY(1);
   }

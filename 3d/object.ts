@@ -1,10 +1,11 @@
 import * as Three from "three";
+import * as THREE from "three";
 import MeshLessObject from "./meshLessObject";
 
 // @ts-ignore
 export default class EngineObject extends MeshLessObject {
   private geometry: Three.BufferGeometry;
-  private material: Three.Material;
+  private material: Three.MeshPhongMaterial;
   private obj: Three.Mesh;
 
   constructor() {
@@ -36,14 +37,29 @@ export default class EngineObject extends MeshLessObject {
     return this;
   }
 
-  setMaterial(material: Three.Material): this {
+  setMaterial(material: Three.MeshPhongMaterial): this {
     this.material = material;
     this.obj.material = material;
     return this;
   }
 
-  setTexture(texture: Three.Texture): this {
-    this.material = new Three.MeshPhongMaterial({ map: texture });
+  setOpacity(opacity: number): this {
+    this.material.opacity = opacity;
+    return this;
+  }
+
+  getOpacity(): number {
+    return this.material.opacity;
+  }
+
+  setTexture(texturePath: string, useNearestNeighbour?: boolean): this {
+    let texture = new THREE.TextureLoader().load(texturePath);
+
+    if (useNearestNeighbour) {
+      texture.magFilter = THREE.NearestFilter;
+    }
+
+    this.material.map = texture;
 
     return this;
   }
@@ -56,55 +72,7 @@ export default class EngineObject extends MeshLessObject {
     return obj;
   }
 
-  getMaterial(material: Three.Material): Three.Material {
-    return material;
-  }
-
-  position = () => {
-    return this.obj.position;
-  };
-
-  rotate(x: number, y: number, z: number): this {
-    this.obj.rotateX(x);
-    this.obj.rotateY(y);
-    this.obj.rotateZ(z);
-
-    return this;
-  }
-
-  rotateX(x: number): this {
-    this.obj.rotateX(x);
-
-    return this;
-  }
-
-  rotateY(y: number): this {
-    this.obj.rotateY(y);
-
-    return this;
-  }
-
-  rotateZ(z: number): this {
-    this.obj.rotateZ(z);
-
-    return this;
-  }
-
-  translateX(x: number): this {
-    this.obj.translateX(x);
-
-    return this;
-  }
-
-  translateY(y: number): this {
-    this.obj.translateY(y);
-
-    return this;
-  }
-
-  translateZ(z: number): this {
-    this.obj.translateZ(z);
-
-    return this;
+  getMaterial(): Three.MeshPhongMaterial {
+    return this.material;
   }
 }

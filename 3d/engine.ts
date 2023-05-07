@@ -4,7 +4,6 @@ import { Scene } from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import EngineObject from "./object";
 import EngineEditorController from "./core/controller/editor";
-import ImageObject from "./core/objects/Image";
 import Camera from "./core/camera/camera";
 import EnginePlayerController from "./core/controller/player";
 import EngineUi from "./core/ui/ui";
@@ -103,11 +102,6 @@ export default class Engine {
       .setGeometry(new THREE.BoxGeometry(10, 0, 10))
       .addToScene(this.scene);
 
-    let light = new THREE.AmbientLight(0xffffff, 0.25);
-    light.position.set(0, 0.25, 0);
-
-    this.scene.add(light);
-
     new EngineObject().addToScene(this.scene);
 
     animate(this.scene, this.camera.getObject(), this.renderer);
@@ -123,6 +117,16 @@ export default class Engine {
     IS_DEV_MODE = true;
     this.init();
     return this;
+  }
+
+  loadTexture(path: string): THREE.Texture {
+    let loader = new THREE.TextureLoader();
+    return loader.load(path);
+  }
+
+  loadCubeTexture(path: string[]): THREE.CubeTexture {
+    let loader = new THREE.CubeTextureLoader();
+    return loader.load(path);
   }
 }
 

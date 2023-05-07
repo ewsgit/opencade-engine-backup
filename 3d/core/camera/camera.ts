@@ -4,6 +4,7 @@ import Engine from "../../engine";
 
 export default class Camera extends MeshLessObject {
   obj: Three.PerspectiveCamera;
+
   constructor(engine: Engine) {
     super();
 

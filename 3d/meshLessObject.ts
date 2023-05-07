@@ -1,4 +1,5 @@
 import * as Three from "three";
+import degreesToRadians from "./core/helpers/degreesToRadians";
 
 export default class MeshLessObject {
   protected obj: Three.Object3D = new Three.Object3D();
@@ -26,9 +27,9 @@ export default class MeshLessObject {
   };
 
   rotate(x: number, y: number, z: number): this {
-    this.obj.rotateX(x);
-    this.obj.rotateY(y);
-    this.obj.rotateZ(z);
+    this.obj.rotateX(degreesToRadians(x));
+    this.obj.rotateY(degreesToRadians(y));
+    this.obj.rotateZ(degreesToRadians(z));
     this.listeners["rotation"].forEach((listener) => {
       listener();
     });
@@ -37,7 +38,7 @@ export default class MeshLessObject {
   }
 
   rotateX(x: number): this {
-    this.obj.rotateX(x);
+    this.obj.rotateX(degreesToRadians(x));
     this.listeners["rotation"].forEach((listener) => {
       listener();
     });
@@ -46,7 +47,7 @@ export default class MeshLessObject {
   }
 
   rotateY(y: number): this {
-    this.obj.rotateY(y);
+    this.obj.rotateY(degreesToRadians(y));
     this.listeners["rotation"].forEach((listener) => {
       listener();
     });
@@ -55,7 +56,7 @@ export default class MeshLessObject {
   }
 
   rotateZ(z: number): this {
-    this.obj.rotateZ(z);
+    this.obj.rotateZ(degreesToRadians(z));
     this.listeners["rotation"].forEach((listener) => {
       listener();
     });
