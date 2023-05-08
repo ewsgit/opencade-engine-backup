@@ -60,6 +60,25 @@ export default class EngineEditorController extends EngineStaticController {
     this.domElement.addEventListener("keyup", (e) => {
       this.keysDown[e.key.toLowerCase()] = false;
     });
+    this.domElement.addEventListener("click", (e) => {
+      if (!document.pointerLockElement) {
+        const rayCaster = new Three.Raycaster();
+        rayCaster.setFromCamera(
+          new Three.Vector2(
+            (e.clientX / this.currentEngine.width) * 2 - 1,
+            -(e.clientY / this.currentEngine.height) * 2 + 1
+          ),
+          this.camera.getObject()
+        );
+        rayCaster
+          .intersectObjects(this.currentEngine.scene.children)[0]
+          .object.rotation.set(
+            Math.random() * 360,
+            Math.random() * 360,
+            Math.random() * 360
+          );
+      }
+    });
     this.domElement.addEventListener("auxclick", async () => {
       if (!document.pointerLockElement) {
         // @ts-ignore

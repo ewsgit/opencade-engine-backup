@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, shell } from "electron";
+import { app, BrowserWindow, ipcMain, powerSaveBlocker, shell } from "electron";
 import { release } from "node:os";
 import { join } from "node:path";
 import { ExecaChildProcess } from "execa";
@@ -45,6 +45,8 @@ async function createWindow() {
   });
 
   win.webContents.toggleDevTools();
+
+  powerSaveBlocker.start("prevent-app-suspension");
 
   win.removeMenu();
   if (process.env.VITE_DEV_SERVER_URL) {

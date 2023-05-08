@@ -7,7 +7,8 @@ export default class ImageObject extends EngineObject {
     width: number,
     height: number,
     texturePath: string,
-    useNearestNeighbour?: boolean
+    useNearestNeighbour?: boolean,
+    textureOffset?: { x: number; y: number }
   ) {
     super();
 
@@ -19,7 +20,10 @@ export default class ImageObject extends EngineObject {
       texture.magFilter = THREE.NearestFilter;
     }
 
-    texture.offset.set(0.5, 0.5);
+    if (textureOffset) {
+      texture.offset.set(textureOffset.x, textureOffset.y);
+    }
+
     texture.repeat.set(512, 512);
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.RepeatWrapping;
@@ -36,6 +40,18 @@ export default class ImageObject extends EngineObject {
     this.getMaterial().side = THREE.DoubleSide;
 
     this.position().setY(1);
+  }
+
+  setImage(texturePath: string, useNearestNeighbour?: boolean): this {
+    let texture = new THREE.TextureLoader().load(texturePath);
+
+    if (useNearestNeighbour) {
+      texture.magFilter = THREE.NearestFilter;
+    }
+
+    this.material.map = texture;
+
+    return this;
   }
 
   snapToCamera(camera: Camera): this {

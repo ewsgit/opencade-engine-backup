@@ -60,6 +60,7 @@ export default class Engine {
     this.uiElementContainer.style.height = "100%";
     this.uiElementContainer.style.overflow = "hidden";
     this.uiElementContainer.style.pointerEvents = "none";
+    this.uiElementContainer.style.userSelect = "none";
 
     this.elementContainer.style.position = "relative";
     this.elementContainer.appendChild(this.gameElementContainer);

@@ -24,16 +24,7 @@ const SceneEditor: React.FC<ISceneEditor> = ({ scenePath }) => {
 
     engine.scene.add(new Three.AmbientLight("#ffffff", 0.5));
 
-    engine.scene.background = engine.loadCubeTexture([
-      "/assets/checker.png",
-      "/assets/checker.png",
-      "/assets/checker.png",
-      "/assets/checker.png",
-      "/assets/checker.png",
-      "/assets/checker.png",
-    ]);
-
-    engine.scene.background.magFilter = Three.NearestFilter;
+    engine.scene.background = new Three.Color(120, 120, 120);
 
     let element = document.createElement("header");
 
@@ -56,9 +47,9 @@ const SceneEditor: React.FC<ISceneEditor> = ({ scenePath }) => {
 
     engine.getEngineUi().addElement(element);
 
-    new ImageObject(250, 250, gridTexture, true)
+    new ImageObject(250, 250, gridTexture, true, { x: 0.5, y: 0.5 })
       .rotateX(90)
-      .setOpacity(0.5)
+      .setOpacity(0.4)
       .addToScene(engine.scene);
   }, []);
 
