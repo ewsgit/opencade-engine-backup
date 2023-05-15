@@ -1,17 +1,20 @@
 import { useEffect, useState } from "react";
 import EditorLayout from "./Main/Layout/Layout";
-import electronApi from "@/electronApi";
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    electronApi().setWindowControls({
-      titleBarOverlay: {
+    fetch("http://localhost:5001/window/set-controls", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
         height: 0,
         color: "#111827",
         symbolColor: "#111827",
-      },
+      }),
     });
     setTimeout(() => {
       setIsLoading(false);
@@ -20,17 +23,28 @@ function App() {
 
   useEffect(() => {
     if (!isLoading) {
-      electronApi().setSize({
-        width: 1000,
-        height: 700,
-        animate: false,
+      fetch("http://localhost:5001/window/set-size", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          width: 1000,
+          height: 700,
+          animate: false,
+        }),
       });
-      electronApi().setWindowControls({
-        titleBarOverlay: {
-          height: 29,
+
+      fetch("http://localhost:5001/window/set-controls", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          height: 32,
           color: "#374151",
           symbolColor: "#ffffff",
-        },
+        }),
       });
     }
   }, [isLoading]);

@@ -31,7 +31,7 @@ const indexHtml = join(process.env.DIST, "index.html");
 
 async function createWindow() {
   win = new BrowserWindow({
-    title: "Main window",
+    title: "OpenCade Engine",
     icon: join(process.env.PUBLIC, "favicon.ico"),
     webPreferences: {
       preload,
@@ -43,8 +43,6 @@ async function createWindow() {
     titleBarOverlay: true,
     backgroundColor: "#374151",
   });
-
-  win.webContents.toggleDevTools();
 
   powerSaveBlocker.start("prevent-app-suspension");
 
@@ -125,13 +123,6 @@ ipcMain.on("set-title", (event, title) => {
   win?.setTitle(title);
 });
 
-ipcMain.on("set-window-controls", (event, params) => {
-  const webContents = event.sender;
-  const win = BrowserWindow.fromWebContents(webContents);
-
-  win?.setTitleBarOverlay(params?.titleBarOverlay);
-});
-
 ipcMain.on("close-window", (event, params) => {
   const webContents = event.sender;
   const win = BrowserWindow.fromWebContents(webContents);
@@ -198,3 +189,5 @@ ipcMain.on("read-path", (event) => {
 });
 
 backend();
+
+export { win };

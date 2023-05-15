@@ -4,6 +4,7 @@ import child_process from "child_process";
 import path from "path";
 import sh from "shell-exec";
 import fs from "fs";
+import { win } from "./index";
 
 export default async function main() {
   const open = (await import("open")).default;
@@ -130,6 +131,22 @@ export default async function main() {
 
   express.get(`/project/name`, (req, res) => {
     return res.json({ name: "error" });
+  });
+
+  express.post("/window/set-controls", (req, res) => {
+    const { height, color, symbolColor } = req.body;
+
+    win?.setTitleBarOverlay({
+      height: height || 32,
+      color: color || "#000000",
+      symbolColor: symbolColor || "#ffffff",
+    });
+  });
+
+  express.post("/window/set-size", (req, res) => {
+    const { width, height, animate } = req.body;
+
+    win?.setSize(width || 100, height || 100, animate || false);
   });
 
   express.listen(5001, () => {

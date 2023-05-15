@@ -2,6 +2,7 @@ import EngineStaticController from "./static";
 import * as Three from "three";
 import Engine from "../../engine";
 import Camera from "../camera/camera";
+import { KEYBOARD_LOCK_KEYS } from "../lockedKeys";
 
 export default class EngineEditorController extends EngineStaticController {
   controllerType = "editor";
@@ -49,18 +50,36 @@ export default class EngineEditorController extends EngineStaticController {
   protected initDomElement() {
     super.initDomElement();
 
+    window.onbeforeunload = function (e) {
+      e.preventDefault();
+      e.returnValue = "Stop";
+    };
+
     this.domElement.tabIndex = 2;
     this.domElement.focus({ preventScroll: true });
     this.domElement.addEventListener("keydown", (e) => {
+      e.stopPropagation();
+      e.preventDefault();
       if (this.keysDown[e.key.toLowerCase()]) {
         return;
       }
       this.keysDown[e.key.toLowerCase()] = true;
     });
+
     this.domElement.addEventListener("keyup", (e) => {
+      e.stopPropagation();
+      e.preventDefault();
       this.keysDown[e.key.toLowerCase()] = false;
     });
+
+    this.domElement.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    });
+
     this.domElement.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       if (!document.pointerLockElement) {
         const rayCaster = new Three.Raycaster();
         rayCaster.setFromCamera(
@@ -79,7 +98,12 @@ export default class EngineEditorController extends EngineStaticController {
           );
       }
     });
-    this.domElement.addEventListener("auxclick", async () => {
+
+    this.domElement.addEventListener("auxclick", async (e) => {
+      e.preventDefault();
+      document.documentElement.requestFullscreen().catch((err) => {
+        console.log(err);
+      });
       if (!document.pointerLockElement) {
         // @ts-ignore
         await this.domElement.requestPointerLock({
@@ -87,11 +111,14 @@ export default class EngineEditorController extends EngineStaticController {
         });
       }
     });
+
     document.addEventListener(
       "pointerlockchange",
       () => {
         if (document.pointerLockElement === this.domElement) {
           this.canMove = true;
+          // @ts-ignore
+          navigator.keyboard.lock(KEYBOARD_LOCK_KEYS);
           document.addEventListener("mousemove", this.mouseMoveListener, false);
           document.addEventListener("mouseup", (e) => {
             if (e.button === 2) {
@@ -100,6 +127,8 @@ export default class EngineEditorController extends EngineStaticController {
           });
         } else {
           this.canMove = false;
+          // @ts-ignore
+          navigator.keyboard.unlock();
           document.removeEventListener(
             "mousemove",
             this.mouseMoveListener,
