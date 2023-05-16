@@ -30,7 +30,7 @@ const StatusBar: React.FC<IStatusBar> = ({ onPlay, onStop }) => {
           "pl-2 pr-2 h-full flex items-center justify-center transition-colors cursor-pointer hover:bg-gray-600"
         }
         onClick={() => {
-          electronApi().openDevTools();
+          fetch("http://localhost:5001/window/open-devtools");
         }}
       >
         {"⚒️"}

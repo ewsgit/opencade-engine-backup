@@ -48,9 +48,9 @@ async function createWindow() {
 
   win.removeMenu();
   if (process.env.VITE_DEV_SERVER_URL) {
-    win.loadURL(url);
+    await win.loadURL(url);
   } else {
-    win.loadFile(indexHtml);
+    await win.loadFile(indexHtml);
   }
 
   win.webContents.on("did-finish-load", () => {
@@ -75,8 +75,8 @@ async function createWindow() {
   });
 }
 
-app.whenReady().then(() => {
-  createWindow();
+app.whenReady().then(async () => {
+  await createWindow();
 });
 
 app.on("window-all-closed", () => {
@@ -92,17 +92,17 @@ app.on("second-instance", () => {
   }
 });
 
-app.on("activate", () => {
+app.on("activate", async () => {
   const allWindows = BrowserWindow.getAllWindows();
   if (allWindows.length) {
     allWindows[0].focus();
   } else {
-    createWindow();
+    await createWindow();
   }
 });
 
 // New window example arg: new windows url
-ipcMain.handle("open-win", (_, arg) => {
+ipcMain.handle("open-win", async (_, arg) => {
   const childWindow = new BrowserWindow({
     webPreferences: {
       preload,
@@ -110,9 +110,9 @@ ipcMain.handle("open-win", (_, arg) => {
   });
 
   if (process.env.VITE_DEV_SERVER_URL) {
-    childWindow.loadURL(`${url}#${arg}`);
+    await childWindow.loadURL(`${url}#${arg}`);
   } else {
-    childWindow.loadFile(indexHtml, { hash: arg });
+    await childWindow.loadFile(indexHtml, { hash: arg });
   }
 });
 

@@ -31,6 +31,7 @@ export default class Engine {
     this.camera = new Camera(this);
     this.scene = new Scene();
     this.renderer = new THREE.WebGLRenderer();
+
     this.init();
     return this;
   }
@@ -43,6 +44,15 @@ export default class Engine {
     Array.from(this.elementContainer.children).forEach((element) => {
       element.remove();
     });
+
+    // @ts-ignore
+    if (window.onEngine) {
+      // @ts-ignore
+      delete window.ocEngine;
+    }
+
+    // @ts-ignore
+    window.ocEngine = this;
 
     this.gameElementContainer = document.createElement("div");
     this.gameElementContainer.setAttribute("data-opencade-game", "");
@@ -117,6 +127,20 @@ export default class Engine {
   disableDevMode(): this {
     IS_DEV_MODE = true;
     this.init();
+    return this;
+  }
+
+  enableFullscreen(): this {
+    this.elementContainer.style.position = "fixed";
+    this.elementContainer.style.top = "0px";
+    this.elementContainer.style.left = "0px";
+    this.elementContainer.style.width = "100%";
+    this.elementContainer.style.height = "100%";
+    return this;
+  }
+
+  disableFullscreen(): this {
+    this.elementContainer.style.position = "relative";
     return this;
   }
 

@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from "react";
-import Engine from "../../../../../../3d/engine";
+import Engine from "../../../../../../engine/3d/engine";
 import path from "path-browserify";
-import UiButton from "../../../../../../3d/core/ui/elements/button";
-import ImageObject from "../../../../../../3d/core/objects/Image";
+import UiButton from "../../../../../../engine/3d/core/ui/elements/button";
+import ImageObject from "../../../../../../engine/3d/core/objects/Image";
 import gridTexture from "./gridTexture.png";
 import * as Three from "three";
 
@@ -47,10 +47,15 @@ const SceneEditor: React.FC<ISceneEditor> = ({ scenePath }) => {
 
     engine.getEngineUi().addElement(element);
 
-    new ImageObject(250, 250, gridTexture, true, { x: 0.5, y: 0.5 })
-      .rotateX(90)
-      .setOpacity(0.4)
-      .addToScene(engine.scene);
+    let gridObject = new ImageObject(250, 250, gridTexture, true, {
+      x: 0.5,
+      y: 0.5,
+    });
+    gridObject.rotateX(90);
+    gridObject.setOpacity(0.4);
+    gridObject.addToScene(engine.scene);
+    gridObject.position().set(0, 0.001, 0);
+    gridObject.shouldBeSaved = false;
   }, []);
 
   return (

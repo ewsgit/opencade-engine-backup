@@ -149,6 +149,10 @@ export default async function main() {
     win?.setSize(width || 100, height || 100, animate || false);
   });
 
+  express.get("/window/open-devtools", (req, res) => {
+    win?.webContents.openDevTools();
+  });
+
   express.listen(5001, () => {
     console.log("Backend online!");
   });

@@ -7,6 +7,7 @@ export default class MeshLessObject {
     position: [() => {}],
     rotation: [() => {}],
   };
+  shouldBeSaved = true;
 
   constructor() {
     return this;

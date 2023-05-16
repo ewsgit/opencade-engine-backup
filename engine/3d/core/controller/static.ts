@@ -1,4 +1,4 @@
-import Camera from "./../camera/camera";
+import Camera from "../camera/camera";
 import Engine from "../../engine";
 
 export default class EngineStaticController {

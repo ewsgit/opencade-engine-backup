@@ -12,6 +12,7 @@ export default class EngineEditorController extends EngineStaticController {
   sensitivity: number = 2;
   _euler: Three.Euler;
   canMove: boolean;
+  seletedObject: Three.Object3D | null = null;
 
   constructor(camera: Camera, domElement: HTMLCanvasElement, engine: Engine) {
     super(camera, domElement, engine);
@@ -89,26 +90,27 @@ export default class EngineEditorController extends EngineStaticController {
           ),
           this.camera.getObject()
         );
-        rayCaster
-          .intersectObjects(this.currentEngine.scene.children)[0]
-          .object.rotation.set(
-            Math.random() * 360,
-            Math.random() * 360,
-            Math.random() * 360
-          );
+        this.seletedObject = rayCaster.intersectObjects(
+          this.currentEngine.scene.children
+        )[0].object;
       }
     });
 
     this.domElement.addEventListener("auxclick", async (e) => {
       e.preventDefault();
-      document.documentElement.requestFullscreen().catch((err) => {
-        console.log(err);
-      });
       if (!document.pointerLockElement) {
         // @ts-ignore
         await this.domElement.requestPointerLock({
           unadjustedMovement: true,
         });
+        document.documentElement
+          .requestFullscreen()
+          .then(() => {
+            this.currentEngine.disableFullscreen();
+          })
+          .catch((err) => {
+            console.log(err);
+          });
       }
     });
 
@@ -119,6 +121,14 @@ export default class EngineEditorController extends EngineStaticController {
           this.canMove = true;
           // @ts-ignore
           navigator.keyboard.lock(KEYBOARD_LOCK_KEYS);
+          document.documentElement
+            .requestFullscreen()
+            .then(() => {
+              this.currentEngine.enableFullscreen();
+            })
+            .catch((err) => {
+              console.log(err);
+            });
           document.addEventListener("mousemove", this.mouseMoveListener, false);
           document.addEventListener("mouseup", (e) => {
             if (e.button === 2) {
