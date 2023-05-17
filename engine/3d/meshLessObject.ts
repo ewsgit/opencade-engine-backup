@@ -1,20 +1,22 @@
 import * as Three from "three";
 import degreesToRadians from "./core/helpers/degreesToRadians";
+import Scene from "./core/scene/scene";
+import radiansToDegrees from "./core/helpers/radiansToDegrees";
 
 export default class MeshLessObject {
-  protected obj: Three.Object3D = new Three.Object3D();
+  shouldBeSaved = true;
+  obj: Three.Object3D = new Three.Object3D();
   protected listeners = {
     position: [() => {}],
     rotation: [() => {}],
   };
-  shouldBeSaved = true;
 
   constructor() {
     return this;
   }
 
-  addToScene(scene: Three.Scene): this {
-    scene.add(this.obj);
+  addToScene(scene: Scene): this {
+    scene.addObject(this);
 
     return this;
   }
@@ -58,6 +60,45 @@ export default class MeshLessObject {
 
   rotateZ(z: number): this {
     this.obj.rotateZ(degreesToRadians(z));
+    this.listeners["rotation"].forEach((listener) => {
+      listener();
+    });
+
+    return this;
+  }
+
+  getRotationX(): number {
+    return radiansToDegrees(this.obj.rotation.x);
+  }
+
+  getRotationY(): number {
+    return radiansToDegrees(this.obj.rotation.y);
+  }
+
+  getRotationZ(): number {
+    return radiansToDegrees(this.obj.rotation.z);
+  }
+
+  setRotationX(x: number): this {
+    this.obj.rotation.x = degreesToRadians(x);
+    this.listeners["rotation"].forEach((listener) => {
+      listener();
+    });
+
+    return this;
+  }
+
+  setRotationY(y: number): this {
+    this.obj.rotation.y = degreesToRadians(y);
+    this.listeners["rotation"].forEach((listener) => {
+      listener();
+    });
+
+    return this;
+  }
+
+  setRotationZ(z: number): this {
+    this.obj.rotation.z = degreesToRadians(z);
     this.listeners["rotation"].forEach((listener) => {
       listener();
     });

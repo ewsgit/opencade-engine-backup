@@ -83,6 +83,7 @@ export default class EngineEditorController extends EngineStaticController {
       e.stopPropagation();
       if (!document.pointerLockElement) {
         const rayCaster = new Three.Raycaster();
+
         rayCaster.setFromCamera(
           new Three.Vector2(
             (e.clientX / this.currentEngine.width) * 2 - 1,
@@ -90,9 +91,18 @@ export default class EngineEditorController extends EngineStaticController {
           ),
           this.camera.getObject()
         );
-        this.seletedObject = rayCaster.intersectObjects(
-          this.currentEngine.scene.children
-        )[0].object;
+
+        console.log(rayCaster.near);
+
+        let intersections = rayCaster.intersectObjects(
+          this.currentEngine.scene.obj.children
+        );
+
+        if (intersections.length > 0) {
+          this.seletedObject = intersections[0].object;
+        }
+
+        console.log(this.seletedObject);
       }
     });
 
@@ -121,14 +131,6 @@ export default class EngineEditorController extends EngineStaticController {
           this.canMove = true;
           // @ts-ignore
           navigator.keyboard.lock(KEYBOARD_LOCK_KEYS);
-          document.documentElement
-            .requestFullscreen()
-            .then(() => {
-              this.currentEngine.enableFullscreen();
-            })
-            .catch((err) => {
-              console.log(err);
-            });
           document.addEventListener("mousemove", this.mouseMoveListener, false);
           document.addEventListener("mouseup", (e) => {
             if (e.button === 2) {

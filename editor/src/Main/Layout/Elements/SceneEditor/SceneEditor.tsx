@@ -5,6 +5,9 @@ import UiButton from "../../../../../../engine/3d/core/ui/elements/button";
 import ImageObject from "../../../../../../engine/3d/core/objects/Image";
 import gridTexture from "./gridTexture.png";
 import * as Three from "three";
+import BoxObject from "../../../../../../engine/3d/core/objects/Box";
+import EngineEditorController from "../../../../../../engine/3d/core/controller/editor";
+import PlaneObject from "../../../../../../engine/3d/core/objects/Plane";
 
 export interface ISceneEditor {
   scenePath: string;
@@ -18,24 +21,25 @@ const SceneEditor: React.FC<ISceneEditor> = ({ scenePath }) => {
       return;
     }
 
-    const engine = new Engine(ref.current);
+    const engine = new Engine(ref.current, EngineEditorController);
 
     engine.enableDevMode();
 
-    engine.scene.add(new Three.AmbientLight("#ffffff", 0.5));
+    engine.scene.obj.add(new Three.AmbientLight("#ffffff", 0.5));
 
-    engine.scene.background = new Three.Color(120, 120, 120);
+    engine.scene.obj.background = new Three.Color(120, 120, 120);
 
     let element = document.createElement("header");
 
     element.textContent = path.basename(scenePath);
-    element.className =
-      "flex absolute top-0 left-0 text-white text-xl p-2 pl-3 gap-2";
+    element.className = "flex absolute top-0 left-0 text-xl p-2 pl-3 gap-2";
     element.style.fontFamily = "Jetbrains Mono";
 
     element.appendChild(
       UiButton("Box", () => {
         console.log("Button clicked!");
+        let box = new BoxObject(1, 1, 1);
+        engine.scene.addObject(box);
       }),
     );
 
@@ -56,6 +60,10 @@ const SceneEditor: React.FC<ISceneEditor> = ({ scenePath }) => {
     gridObject.addToScene(engine.scene);
     gridObject.position().set(0, 0.001, 0);
     gridObject.shouldBeSaved = false;
+    gridObject.obj.renderOrder = 2;
+
+    let plane = new PlaneObject();
+    plane.addToScene(engine.scene);
   }, []);
 
   return (

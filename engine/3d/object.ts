@@ -1,27 +1,22 @@
 import * as Three from "three";
 import * as THREE from "three";
 import MeshLessObject from "./meshLessObject";
+import CHECKER_TEX from "./checker.png";
 
 // @ts-ignore
 export default class EngineObject extends MeshLessObject {
+  obj: Three.Mesh;
   private geometry: Three.BufferGeometry;
   private material: Three.MeshPhongMaterial;
-  private obj: Three.Mesh;
 
   constructor() {
     super();
 
-    const texture = new Three.TextureLoader().load("/assets/checker.png");
+    const texture = new Three.TextureLoader().load(CHECKER_TEX);
     texture.magFilter = Three.NearestFilter;
     this.material = new Three.MeshPhongMaterial({ map: texture });
     this.geometry = new Three.BoxGeometry(0.5, 0.5, 0.5);
     this.obj = new Three.Mesh(this.geometry, this.material);
-
-    return this;
-  }
-
-  addToScene(scene: Three.Scene): this {
-    scene.add(this.obj);
 
     return this;
   }
@@ -64,12 +59,12 @@ export default class EngineObject extends MeshLessObject {
     return this;
   }
 
-  getGeometry(geometry: Three.BufferGeometry): Three.BufferGeometry {
-    return geometry;
+  getGeometry(): Three.BufferGeometry {
+    return this.geometry;
   }
 
-  getMesh(obj: Three.Mesh): Three.Mesh {
-    return obj;
+  getMesh(): Three.Mesh {
+    return this.obj;
   }
 
   getMaterial(): Three.MeshPhongMaterial {

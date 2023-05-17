@@ -1,12 +1,11 @@
 import * as THREE from "three";
-import { Scene } from "three";
 // @ts-ignore
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import EngineObject from "./object";
-import EngineEditorController from "./core/controller/editor";
 import Camera from "./core/camera/camera";
-import EnginePlayerController from "./core/controller/player";
 import EngineUi from "./core/ui/ui";
+import Scene from "./core/scene/scene";
+import EngineStaticController from "./core/controller/static";
+import KeyboardKeypressManager from "./core/keyboard/keypress";
 
 let IS_DEV_MODE = false;
 
@@ -23,14 +22,22 @@ export default class Engine {
   gameElementContainer: HTMLDivElement;
   // @ts-ignore
   uiElementContainer: HTMLDivElement;
+  controllerType: typeof EngineStaticController;
+  // @ts-ignore
+  keypressManager: KeyboardKeypressManager;
 
-  constructor(containerElement: HTMLDivElement) {
+  constructor(
+    containerElement: HTMLDivElement,
+    controllerType: typeof EngineStaticController = EngineStaticController
+  ) {
     this.elementContainer = containerElement;
     this.width = 250;
     this.height = 250;
     this.camera = new Camera(this);
     this.scene = new Scene();
     this.renderer = new THREE.WebGLRenderer();
+    this.controllerType = controllerType;
+    this.keypressManager = new KeyboardKeypressManager(this);
 
     this.init();
     return this;
@@ -60,6 +67,7 @@ export default class Engine {
     this.gameElementContainer.style.top = "0px";
     this.gameElementContainer.style.left = "0px";
     this.gameElementContainer.style.width = "100%";
+    this.gameElementContainer.tabIndex = 1;
 
     this.uiElementContainer = document.createElement("div");
     this.uiElementContainer.setAttribute("data-opencade-ui", "");
@@ -91,11 +99,7 @@ export default class Engine {
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFShadowMap;
 
-    if (IS_DEV_MODE) {
-      new EngineEditorController(this.camera, this.renderer.domElement, this);
-    } else {
-      new EnginePlayerController(this.camera, this.renderer.domElement, this);
-    }
+    new this.controllerType(this.camera, this.renderer.domElement, this);
 
     new ResizeObserver(() => {
       const containerBounds = this.elementContainer.getBoundingClientRect();
@@ -107,15 +111,9 @@ export default class Engine {
 
     this.gameElementContainer.appendChild(this.renderer.domElement);
 
-    this.scene.background = new THREE.Color(0x001122);
+    this.scene.obj.background = new THREE.Color(0x001122);
 
-    new EngineObject()
-      .setGeometry(new THREE.BoxGeometry(10, 0, 10))
-      .addToScene(this.scene);
-
-    new EngineObject().addToScene(this.scene);
-
-    animate(this.scene, this.camera.getObject(), this.renderer);
+    animate(this.scene.obj, this.camera.getObject(), this.renderer);
   }
 
   enableDevMode(): this {
