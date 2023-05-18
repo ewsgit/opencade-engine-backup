@@ -50,12 +50,6 @@ export default class EngineEditorController extends EngineStaticController {
 
   protected initDomElement() {
     super.initDomElement();
-
-    window.onbeforeunload = function (e) {
-      e.preventDefault();
-      e.returnValue = "Stop";
-    };
-
     this.domElement.tabIndex = 2;
     this.domElement.focus({ preventScroll: true });
     this.domElement.addEventListener("keydown", (e) => {

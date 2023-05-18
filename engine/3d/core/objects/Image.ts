@@ -49,7 +49,7 @@ export default class ImageObject extends EngineObject {
       texture.magFilter = THREE.NearestFilter;
     }
 
-    this.material.map = texture;
+    this.getMaterial().map = texture;
 
     return this;
   }

@@ -4,37 +4,58 @@ export default class KeyboardKeypressManager {
   private listeners: { [keys: string]: (() => void)[] } = {};
   private pressedKeys: string[] = [];
 
-  constructor(engine: Engine) {
-    console.log("keypressManager loaded");
-    engine.renderer.domElement.addEventListener("keydown", (e) => {
-      console.log(e);
-      if (!this.pressedKeys.includes(e.key.toLowerCase())) {
-        this.pressedKeys.push(e.key.toLowerCase());
-      }
-
-      Object.keys(this.listeners).forEach((key) => {
-        let keys = key.split("+");
-
-        let pressed = true;
-        keys.forEach((key) => {
-          if (!this.pressedKeys.includes(key)) pressed = false;
-        });
-      });
-    });
-
-    engine.renderer.domElement.addEventListener("keyup", (e) => {
-      this.pressedKeys = this.pressedKeys.filter((key) => key !== e.key);
-    });
-
-    return this;
+  constructor(private engine: Engine) {
+    this.registerEventListeners();
   }
 
-  // expects a valid keyCode such as "a" or "arrowRight" and "a+b" or "a+arrowRight"
   listenFor(keyCombination: string, callback: () => void) {
-    if (!this.listeners[keyCombination.toLowerCase()]) {
-      this.listeners[keyCombination.toLowerCase()] = [];
+    const keys = keyCombination.split("+").map((k) => k.toLowerCase());
+    const combination = keys.sort().join("+");
+    if (!this.listeners[combination]) {
+      this.listeners[combination] = [];
     }
+    this.listeners[combination].push(callback);
+  }
 
-    this.listeners[keyCombination.toLowerCase()].push(callback);
+  private registerEventListeners() {
+    this.engine.gameElementContainer.addEventListener(
+      "keydown",
+      this.handleKeyDown
+    );
+    this.engine.gameElementContainer.addEventListener(
+      "keyup",
+      this.handleKeyUp
+    );
+  }
+
+  private handleKeyDown = (event: KeyboardEvent) => {
+    const key = event.key.toLowerCase();
+    if (!this.pressedKeys.includes(key)) {
+      this.pressedKeys.push(key);
+    }
+    this.executeCallbacks();
+  };
+
+  private handleKeyUp = (event: KeyboardEvent) => {
+    const key = event.key.toLowerCase();
+    const index = this.pressedKeys.indexOf(key);
+    if (index !== -1) {
+      this.pressedKeys.splice(index, 1);
+    }
+  };
+
+  private executeCallbacks() {
+    Object.keys(this.listeners).forEach((combination) => {
+      const keys = combination.split("+");
+      let allKeysPressed = true;
+      keys.forEach((key) => {
+        if (!this.pressedKeys.includes(key)) {
+          allKeysPressed = false;
+        }
+      });
+      if (allKeysPressed) {
+        this.listeners[combination].forEach((listener) => listener());
+      }
+    });
   }
 }

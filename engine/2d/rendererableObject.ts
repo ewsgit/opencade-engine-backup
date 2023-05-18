@@ -10,8 +10,6 @@ export class RenderableObject {
   private height: number;
   private context: CanvasRenderingContext2D;
   private onRenderListeners: ((object: this) => void)[];
-  private state: { [key: string]: any } = {};
-  private stateListeners: { [key: string]: ((value: any) => void)[] } = {};
 
   constructor() {
     this.posX = 0;

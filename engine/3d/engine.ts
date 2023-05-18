@@ -19,7 +19,7 @@ export default class Engine {
   renderer: THREE.WebGLRenderer;
   elementContainer: HTMLDivElement;
   // @ts-ignore
-  gameElementContainer: HTMLDivElement;
+  gameElementContainer: HTMLButtonElement;
   // @ts-ignore
   uiElementContainer: HTMLDivElement;
   controllerType: typeof EngineStaticController;
@@ -37,7 +37,6 @@ export default class Engine {
     this.scene = new Scene();
     this.renderer = new THREE.WebGLRenderer();
     this.controllerType = controllerType;
-    this.keypressManager = new KeyboardKeypressManager(this);
 
     this.init();
     return this;
@@ -61,13 +60,15 @@ export default class Engine {
     // @ts-ignore
     window.ocEngine = this;
 
-    this.gameElementContainer = document.createElement("div");
+    this.gameElementContainer = document.createElement("button");
     this.gameElementContainer.setAttribute("data-opencade-game", "");
     this.gameElementContainer.style.position = "absolute";
     this.gameElementContainer.style.top = "0px";
     this.gameElementContainer.style.left = "0px";
     this.gameElementContainer.style.width = "100%";
-    this.gameElementContainer.tabIndex = 1;
+    this.gameElementContainer.style.border = "none";
+    this.gameElementContainer.style.padding = "0";
+    this.gameElementContainer.style.margin = "0";
 
     this.uiElementContainer = document.createElement("div");
     this.uiElementContainer.setAttribute("data-opencade-ui", "");
@@ -98,6 +99,8 @@ export default class Engine {
     this.renderer.setSize(this.width, this.height);
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFShadowMap;
+
+    this.keypressManager = new KeyboardKeypressManager(this);
 
     new this.controllerType(this.camera, this.renderer.domElement, this);
 

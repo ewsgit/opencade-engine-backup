@@ -6,7 +6,7 @@ export default class SnakeController extends EngineStaticController {
   constructor(camera: Camera, domElement: HTMLCanvasElement, engine: Engine) {
     super(camera, domElement, engine);
 
-    this.camera.position().set(0, 5.5, 0);
+    this.camera.position().set(0, 6.5, 0);
     this.camera.rotateX(-90);
   }
 }
